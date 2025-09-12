@@ -46,61 +46,10 @@
     <div id="app-container" class="min-h-screen max-w-lg mx-auto p-4 flex flex-col fade-in">
         
         <!-- Header -->
-        <header id="app-header" class="hidden flex justify-between items-center mb-6 pb-4 border-b border-slate-700/50">
-            <div>
-                 <h1 class="text-2xl font-bold text-cyan-400 tracking-wide" data-translate="appTitle">Smoke-Free Journey</h1>
-                 <p id="user-greeting" class="text-xs text-slate-400"></p>
-            </div>
-            <div class="flex items-center space-x-2">
-                <button id="language-switcher" class="px-3 py-1 text-sm font-semibold bg-slate-800 rounded-full hover:bg-slate-700 transition-colors shadow-md">தமிழ்</button>
-                <button id="sign-out-button" class="p-2 text-sm font-semibold bg-slate-800 rounded-full hover:bg-slate-700 transition-colors shadow-md" title="Sign Out">
-                    <svg class="w-4 h-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
-                </button>
-            </div>
+        <header id="app-header" class="flex justify-between items-center mb-6 pb-4 border-b border-slate-700/50">
+            <h1 class="text-2xl font-bold text-cyan-400 tracking-wide" data-translate="appTitle">Smoke-Free Journey</h1>
+            <button id="language-switcher" class="px-3 py-1 text-sm font-semibold bg-slate-800 rounded-full hover:bg-slate-700 transition-colors shadow-md">தமிழ்</button>
         </header>
-
-        <!-- Login / Sign Up Screen -->
-        <div id="auth-screen" class="flex-grow flex flex-col justify-center items-center text-center p-4">
-            <div class="w-full bg-slate-800/50 p-8 rounded-2xl shadow-2xl">
-                <!-- Login View -->
-                <div id="login-view">
-                    <h2 class="text-3xl font-bold mb-2" data-translate="loginTitle">Smoke Free</h2>
-                    <p class="text-slate-400 mb-8" data-translate="loginSubtitle">Please sign in to continue.</p>
-                    <form id="login-form" class="space-y-4 text-left">
-                        <input type="email" id="login-email" class="w-full bg-slate-900 border-2 border-slate-700 text-white text-base rounded-lg p-3 transition form-input" placeholder="Email Address" required>
-                        <input type="password" id="login-password" class="w-full bg-slate-900 border-2 border-slate-700 text-white text-base rounded-lg p-3 transition form-input" placeholder="Password" required>
-                        <p id="login-error" class="text-red-400 text-sm text-center hidden"></p>
-                        <button type="submit" class="w-full bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white font-bold py-3 px-4 rounded-lg transition-transform transform hover:scale-105 shadow-lg">Log In</button>
-                    </form>
-                    <a href="#" id="forgot-password-link" class="text-cyan-400 text-sm mt-4 inline-block" data-translate="forgotPassword">Forgot Password?</a>
-                    <div class="my-6 flex items-center">
-                        <hr class="flex-grow border-slate-700">
-                        <span class="px-4 text-slate-500 text-sm">or</span>
-                        <hr class="flex-grow border-slate-700">
-                    </div>
-                    <button id="google-signin-button" class="w-full bg-white text-slate-800 font-semibold py-3 px-4 rounded-lg flex items-center justify-center space-x-2 hover:bg-slate-200 transition">
-                        <svg class="w-5 h-5" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8c-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039L38.802 8.841C34.522 4.962 29.572 2.5 24 2.5C11.93 2.5 2.5 11.93 2.5 24s9.43 21.5 21.5 21.5S45.5 36.07 45.5 24c0-1.54-.13-3.05-.389-4.5z"></path><path fill="#FF3D00" d="M6.306 14.691l6.571 4.819C14.655 15.108 18.961 12.5 24 12.5c3.059 0 5.842 1.154 7.961 3.039L38.802 8.841C34.522 4.962 29.572 2.5 24 2.5C16.318 2.5 9.643 6.914 6.306 14.691z"></path><path fill="#4CAF50" d="M24 45.5c5.572 0 10.522-2.462 14.802-6.359l-6.571-4.819C29.941 36.485 27.213 38 24 38c-5.039 0-9.345-2.608-11.124-6.481l-6.571 4.819C9.643 41.086 16.318 45.5 24 45.5z"></path><path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303c-.792 2.237-2.231 4.166-4.087 5.571l6.571 4.819C42.818 35.258 45.5 30.083 45.5 24c0-1.54-.13-3.05-.389-4.5z"></path></svg>
-                        <span data-translate="googleSignIn">Sign In with Google</span>
-                    </button>
-                    <p class="mt-8 text-sm text-slate-400" data-translate="noAccount">Don't have an account? <a href="#" id="show-signup" class="font-semibold text-cyan-400 hover:underline">Sign Up</a></p>
-                </div>
-                <!-- Sign Up View -->
-                <div id="signup-view" class="hidden">
-                    <h2 class="text-3xl font-bold mb-2" data-translate="signupTitle">Create Account</h2>
-                    <p class="text-slate-400 mb-8" data-translate="signupSubtitle">Join us on the journey to a healthier life.</p>
-                    <form id="signup-form" class="space-y-4 text-left">
-                        <input type="text" id="signup-firstname" class="w-full bg-slate-900 border-2 border-slate-700 text-white text-base rounded-lg p-3 transition form-input" placeholder="First Name" required>
-                        <input type="text" id="signup-lastname" class="w-full bg-slate-900 border-2 border-slate-700 text-white text-base rounded-lg p-3 transition form-input" placeholder="Last Name" required>
-                        <input type="email" id="signup-email" class="w-full bg-slate-900 border-2 border-slate-700 text-white text-base rounded-lg p-3 transition form-input" placeholder="Email Address" required>
-                        <input type="password" id="signup-password" class="w-full bg-slate-900 border-2 border-slate-700 text-white text-base rounded-lg p-3 transition form-input" placeholder="Password (min. 6 characters)" required>
-                        <p id="signup-error" class="text-red-400 text-sm text-center hidden"></p>
-                        <button type="submit" class="w-full bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white font-bold py-3 px-4 rounded-lg transition-transform transform hover:scale-105 shadow-lg">Create Account</button>
-                    </form>
-                    <p class="mt-8 text-sm text-slate-400" data-translate="hasAccount">Already have an account? <a href="#" id="show-login" class="font-semibold text-cyan-400 hover:underline">Log In</a></p>
-                </div>
-            </div>
-        </div>
-
 
         <!-- Initial Setup Screen -->
         <div id="setup-screen" class="hidden flex-grow flex flex-col justify-center items-center text-center p-4">
@@ -182,43 +131,11 @@
         <!-- ... urge modal content ... -->
     </div>
 
-    <!-- Firebase SDK -->
-    <script type="module">
-        // Your unique Firebase configuration
-        const firebaseConfig = {
-          apiKey: "AIzaSyAKjvrUA0DTdAm6hUf71TqDJv0V3VadeGc",
-          authDomain: "smoke-free-fffb4.firebaseapp.com",
-          projectId: "smoke-free-fffb4",
-          storageBucket: "smoke-free-fffb4.appspot.com",
-          messagingSenderId: "349114836791",
-          appId: "1:349114836791:web:bb96a5af211d54485cdcb2",
-          measurementId: "G-RSWWG6L9K6"
-        };
-
-        // Import statements
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
-
+    <script>
         // --- DOM Elements ---
-        const authScreen = document.getElementById('auth-screen');
-        const loginView = document.getElementById('login-view');
-        const signupView = document.getElementById('signup-view');
-        const loginForm = document.getElementById('login-form');
-        const signupForm = document.getElementById('signup-form');
-        const loginError = document.getElementById('login-error');
-        const signupError = document.getElementById('signup-error');
-        const showSignup = document.getElementById('show-signup');
-        const showLogin = document.getElementById('show-login');
-        const forgotPasswordLink = document.getElementById('forgot-password-link');
-        
         const setupScreen = document.getElementById('setup-screen');
         const mainScreen = document.getElementById('main-screen');
         const congratsScreen = document.getElementById('congrats-screen');
-        const appHeader = document.getElementById('app-header');
-        const userGreeting = document.getElementById('user-greeting');
-        const signOutButton = document.getElementById('sign-out-button');
-        const googleSignInButton = document.getElementById('google-signin-button');
         const setupForm = document.getElementById('setup-form');
         const initialCigarettesInput = document.getElementById('initial-cigarettes');
         const languageSwitcher = document.getElementById('language-switcher');
@@ -234,30 +151,15 @@
         const genericModalTitle = document.getElementById('generic-modal-title');
         const genericModalText = document.getElementById('generic-modal-text');
 
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-
         // --- App State ---
         let state = {}; 
-        let currentUser = null;
         let countdownInterval = null;
         let lastUrgeTipIndex = -1;
 
-        // --- Translations (Expanded) ---
+        // --- Translations ---
         const translations = {
              en: {
                 appTitle: "Smoke-Free Journey",
-                loginTitle: "Smoke Free",
-                loginSubtitle: "Please sign in to continue.",
-                forgotPassword: "Forgot Password?",
-                googleSignIn: "Sign In with Google",
-                noAccount: "Don't have an account?",
-                signupTitle: "Create Account",
-                signupSubtitle: "Join us on the journey to a healthier life.",
-                hasAccount: "Already have an account?",
-                // ... all other translations
                 welcomeTitle: "Welcome!",
                 welcomeSubtitle: "Let's start your journey to a smoke-free life.",
                 initialCigarettesLabel: "How many cigarettes do you smoke per day?",
@@ -270,8 +172,6 @@
                 targetHeader: "Target",
                 smokedHeader: "Smoked",
                 statusHeader: "Status",
-                motivationTitle: "Great Job Yesterday!",
-                motivationKeepGoingButton: "Keep Going!",
                 congratsTitle: "Congratulations!",
                 congratsSubtitle: "You have completed your journey and are now smoke-free! We are proud of you.",
                 runningMessage: "Don't be a slave to a stick of paper and leaves. Break the chains with every craving you conquer.",
@@ -283,197 +183,231 @@
             },
             ta: {
                 appTitle: "புகைப்பிடிக்காத பயணம்",
-                loginTitle: "Smoke Free",
-                loginSubtitle: "தொடர உள்நுழையவும்.",
-                forgotPassword: "கடவுச்சொல்லை மறந்து விட்டீர்களா?",
-                googleSignIn: "Google மூலம் உள்நுழையவும்",
-                noAccount: "கணக்கு இல்லையா?",
-                signupTitle: "கணக்கை உருவாக்கவும்",
-                signupSubtitle: "ஆரோக்கியமான வாழ்க்கைக்கான பயணத்தில் எங்களுடன் சேருங்கள்.",
-                hasAccount: " ஏற்கனவே கணக்கு உள்ளதா?",
-                 // ... all other translations
-                welcomeTitle: "வாருங்கள்!", welcomeSubtitle: "புகையற்ற வாழ்க்கையை நோக்கிய உங்கள் பயணத்தைத் தொடங்குவோம்.",
+                welcomeTitle: "வாருங்கள்!", 
+                welcomeSubtitle: "புகையற்ற வாழ்க்கையை நோக்கிய உங்கள் பயணத்தைத் தொடங்குவோம்.",
                 initialCigarettesLabel: "ஒரு நாளைக்கு எத்தனை சிகரெட் புகைக்கிறீர்கள்?",
-                startButton: "பயணத்தைத் தொடங்கு", todaysTarget: "இன்றைய இலக்கு", smokedToday: "இன்று புகைத்தது",
-                smokedButton: "நான் ஒரு சிகரெட் பிடித்தேன்", progressLogTitle: "முன்னேற்றப் பதிவு",
-                dateHeader: "தேதி", targetHeader: "இலக்கு", smokedHeader: "புகைத்தது", statusHeader: "நிலை",
-                motivationTitle: "நேற்று சிறப்பாக செய்தீர்கள்!", motivationKeepGoingButton: "தொடர்ந்து முன்னேறு!",
-                congratsTitle: "வாழ்த்துக்கள்!", congratsSubtitle: "உங்கள் பயணத்தை வெற்றிகரமாக முடித்துவிட்டீர்கள், இப்போது நீங்கள் புகைப்பிடிக்காதவர்! உங்களை நினைத்து நாங்கள் பெருமைப்படுகிறோம்.",
+                startButton: "பயணத்தைத் தொடங்கு", 
+                todaysTarget: "இன்றைய இலக்கு", 
+                smokedToday: "இன்று புகைத்தது",
+                smokedButton: "நான் ஒரு சிகரெட் பிடித்தேன்", 
+                progressLogTitle: "முன்னேற்றப் பதிவு",
+                dateHeader: "தேதி", 
+                targetHeader: "இலக்கு", 
+                smokedHeader: "புகைத்தது", 
+                statusHeader: "நிலை",
+                congratsTitle: "வாழ்த்துக்கள்!", 
+                congratsSubtitle: "உங்கள் பயணத்தை வெற்றிகரமாக முடித்துவிட்டீர்கள், இப்போது நீங்கள் புகைப்பிடிக்காதவர்! உங்களை நினைத்து நாங்கள் பெருமைப்படுகிறோம்.",
                 runningMessage: "ஒரு காகிதத்திற்கும் இலைகளுக்கும் அடிமையாக இருக்காதீர்கள். நீங்கள் வெல்லும் ஒவ்வொரு ஏக்கத்துடனும் சங்கிலிகளை உடைக்கவும்.",
-                urgeButton: "ஒரு ஆசையா?", urgeTitle: "திடமாக இருங்கள்!", urgeCloseButton: "என்னால் முடியும்!",
+                urgeButton: "ஒரு ஆசையா?", 
+                urgeTitle: "திடமாக இருங்கள்!", 
+                urgeCloseButton: "என்னால் முடியும்!",
                 limitReachedText: "அடுத்து <span id='countdown-timer' class='text-white'>--:--:--</span>",
-                statusPass: "வெற்றி", statusFail: "தோல்வி", statusPending: "நிலுவையில்", statusWaiting: "காத்திரு"
+                statusPass: "வெற்றி", 
+                statusFail: "தோல்வி", 
+                statusPending: "நிலுவையில்", 
+                statusWaiting: "காத்திரு"
             }
         };
 
-        // --- Auth & App Flow ---
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                currentUser = user;
-                const userDocRef = doc(db, "users", user.uid);
-                const userDocSnap = await getDoc(userDocRef);
-
-                let userName = user.displayName ? user.displayName.split(" ")[0] : "User";
-                if (userDocSnap.exists()) {
-                    userName = userDocSnap.data().firstName || userName;
-                }
-                userGreeting.textContent = `Hi, ${userName}!`;
-
-                await loadStateFromFirestore();
-                if (state.plan && state.plan.length > 0) {
+        // --- Core App Functions ---
+        function init() {
+            loadState();
+            updateUIForLanguage();
+            if (state.plan && state.plan.length > 0) {
+                 const finalDay = state.plan[state.plan.length -1];
+                 if(finalDay.target === 0 && finalDay.status === 'Pass'){
+                     showScreen('congrats');
+                 } else {
                      showScreen('main');
                      render();
                      checkDailyStatus();
-                } else {
-                    showScreen('setup');
-                }
+                 }
             } else {
-                currentUser = null;
-                showScreen('auth');
+                showScreen('setup');
             }
-        });
-
-        // --- Event Listeners ---
-        function init() {
             setupEventListeners();
         }
 
         function setupEventListeners() {
-            showSignup.addEventListener('click', (e) => { e.preventDefault(); loginView.classList.add('hidden'); signupView.classList.remove('hidden'); });
-            showLogin.addEventListener('click', (e) => { e.preventDefault(); signupView.classList.add('hidden'); loginView.classList.remove('hidden'); });
-            
-            loginForm.addEventListener('submit', handleLogin);
-            signupForm.addEventListener('submit', handleSignup);
-            forgotPasswordLink.addEventListener('click', handleForgotPassword);
-
-            googleSignInButton.addEventListener('click', signInWithGoogle);
-            signOutButton.addEventListener('click', signOutUser);
             setupForm.addEventListener('submit', startJourney);
             languageSwitcher.addEventListener('click', toggleLanguage);
             smokedButton.addEventListener('click', handleSmokedClick);
             urgeButton.addEventListener('click', showUrgeModal);
         }
 
-        // --- New Auth Handlers ---
-        async function handleLogin(e) {
+        function startJourney(e) {
             e.preventDefault();
-            const email = loginForm['login-email'].value;
-            const password = loginForm['login-password'].value;
-            loginError.classList.add('hidden');
-
-            try {
-                await signInWithEmailAndPassword(auth, email, password);
-            } catch (error) {
-                loginError.textContent = getFriendlyAuthError(error.code);
-                loginError.classList.remove('hidden');
+            const count = parseInt(initialCigarettesInput.value);
+            if (count > 0) {
+                state.initialCount = count;
+                state.startDate = getTodayDateString();
+                state.lastCheckedDate = getYesterdayDateString();
+                generatePlan();
+                saveState();
+                showScreen('main');
+                render();
             }
         }
 
-        async function handleSignup(e) {
-            e.preventDefault();
-            const firstName = signupForm['signup-firstname'].value;
-            const lastName = signupForm['signup-lastname'].value;
-            const email = signupForm['signup-email'].value;
-            const password = signupForm['signup-password'].value;
-            signupError.classList.add('hidden');
-            
-            // Validation
-            if (!firstName || !lastName) {
-                 signupError.textContent = "Please enter your full name.";
-                 signupError.classList.remove('hidden');
-                 return;
-            }
-            if (password.length < 6) {
-                 signupError.textContent = "Password must be at least 6 characters.";
-                 signupError.classList.remove('hidden');
-                 return;
-            }
-
-            try {
-                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                const user = userCredential.user;
-                // Save user name to Firestore
-                const userDocRef = doc(db, "users", user.uid);
-                await setDoc(userDocRef, {
-                    firstName, lastName, email, createdAt: new Date()
-                });
-            } catch (error) {
-                signupError.textContent = getFriendlyAuthError(error.code);
-                signupError.classList.remove('hidden');
-            }
-        }
-
-        async function handleForgotPassword(e) {
-            e.preventDefault();
-            const email = loginForm['login-email'].value;
-            if (!email) {
-                showModal("Forgot Password", "Please enter your email address in the login form first, then click 'Forgot Password'.");
-                return;
-            }
-            try {
-                await sendPasswordResetEmail(auth, email);
-                showModal("Password Reset", "A password reset link has been sent to your email address. Please check your inbox.");
-            } catch (error) {
-                showModal("Error", getFriendlyAuthError(error.code));
-            }
-        }
-
-        async function signInWithGoogle() {
-            const provider = new GoogleAuthProvider();
-            try {
-                const result = await signInWithPopup(auth, provider);
-                const user = result.user;
-                // Check if user data already exists
-                const userDocRef = doc(db, "users", user.uid);
-                const userDocSnap = await getDoc(userDocRef);
-                if (!userDocSnap.exists()) {
-                    const [firstName, ...lastName] = user.displayName.split(" ");
-                    await setDoc(userDocRef, {
-                        firstName: firstName || "User",
-                        lastName: lastName.join(" ") || "",
-                        email: user.email,
-                        createdAt: new Date()
-                    });
-                }
-            } catch (error) {
-                showModal("Sign-In Error", getFriendlyAuthError(error.code));
-            }
-        }
-        
-        function getFriendlyAuthError(code) {
-            switch(code) {
-                case 'auth/user-not-found':
-                case 'auth/wrong-password':
-                    return 'Invalid email or password. Please try again.';
-                case 'auth/email-already-in-use':
-                    return 'This email is already registered. Please log in.';
-                case 'auth/invalid-email':
-                    return 'Please enter a valid email address.';
-                case 'auth/weak-password':
-                    return 'Password is too weak. Please use at least 6 characters.';
-                default:
-                    return 'An unexpected error occurred. Please try again.';
-            }
-        }
-
-        // --- Screens & Modals ---
         function showScreen(screenName) {
-            authScreen.classList.add('hidden');
             setupScreen.classList.add('hidden');
             mainScreen.classList.add('hidden');
             congratsScreen.classList.add('hidden');
-            appHeader.classList.add('hidden');
 
-            if(screenName === 'auth') {
-                authScreen.classList.remove('hidden');
-            } else {
-                appHeader.classList.remove('hidden');
-                if(screenName === 'setup') setupScreen.classList.remove('hidden');
-                if(screenName === 'main') mainScreen.classList.remove('hidden');
-                if(screenName === 'congrats') congratsScreen.classList.remove('hidden');
+            if(screenName === 'setup') setupScreen.classList.remove('hidden');
+            if(screenName === 'main') mainScreen.classList.remove('hidden');
+            if(screenName === 'congrats') congratsScreen.classList.remove('hidden');
+        }
+
+        function toggleLanguage() {
+            state.language = state.language === 'en' ? 'ta' : 'en';
+            saveState();
+            updateUIForLanguage();
+            if (state.plan && state.plan.length > 0) {
+                render(); 
             }
         }
-        
+
+        function handleSmokedClick() {
+            const todayEntry = getTodayEntry();
+            if (todayEntry && todayEntry.smoked < todayEntry.target) {
+                todayEntry.smoked += 1;
+                if (todayEntry.smoked >= todayEntry.target) {
+                    todayEntry.status = 'Waiting';
+                }
+                saveState();
+                render();
+            }
+        }
+
+        function checkDailyStatus() {
+            const todayStr = getTodayDateString();
+            if(!state.plan || state.lastCheckedDate === todayStr) return;
+            
+            let showMotivation = false;
+            
+            state.plan.forEach(day => {
+                if (day.date < todayStr && (day.status === 'Pending' || day.status === 'Waiting')) {
+                    day.status = day.smoked <= day.target ? 'Pass' : 'Fail';
+                    if (day.date === getYesterdayDateString() && day.status === 'Pass') {
+                        showMotivation = true;
+                    }
+                }
+            });
+
+            if (showMotivation) { showModal("Great Job Yesterday!", "Keep up the great work!"); }
+
+            state.lastCheckedDate = todayStr;
+            saveState();
+            renderTable();
+        }
+
+        function generatePlan() { 
+            state.plan = []; 
+            let currentDate = new Date(); 
+            let weekCounter = 0; 
+            while(true) { 
+                const weekNumber = Math.floor(weekCounter / 7); 
+                const dailyTarget = Math.max(0, state.initialCount - 1 - weekNumber); 
+                state.plan.push({ date: toISODateString(currentDate), target: dailyTarget, smoked: 0, status: 'Pending' }); 
+                if (dailyTarget === 0) break; 
+                currentDate.setDate(currentDate.getDate() + 1); 
+                weekCounter++; 
+            } 
+        }
+
+        function renderDashboard() { 
+            const todayEntry = getTodayEntry(); 
+            if (todayEntry) { 
+                targetCountEl.textContent = todayEntry.target; 
+                smokedCountEl.textContent = todayEntry.smoked; 
+                const { smoked, target } = todayEntry; 
+                smokedCountEl.classList.remove('text-green-400', 'text-amber-400', 'text-red-400'); 
+                if (target > 0) { 
+                    if (smoked <= target / 3) { 
+                        smokedCountEl.classList.add('text-green-400'); 
+                    } else if (smoked <= (target * 2) / 3) { 
+                        smokedCountEl.classList.add('text-amber-400'); 
+                    } else { 
+                        smokedCountEl.classList.add('text-red-400'); 
+                    } 
+                } else { 
+                    smokedCountEl.classList.add('text-green-400'); 
+                } 
+                if (smoked >= target) { 
+                    smokedButton.classList.add('hidden'); 
+                    limitReachedControls.classList.remove('hidden'); 
+                    limitReachedButton.innerHTML = translations[state.language].limitReachedText; 
+                    startCountdown(); 
+                } else { 
+                    smokedButton.classList.remove('hidden'); 
+                    limitReachedControls.classList.add('hidden'); 
+                    stopCountdown(); 
+                } 
+            } else { 
+                targetCountEl.textContent = '0'; 
+                smokedCountEl.textContent = '0'; 
+                smokedButton.classList.add('hidden'); 
+            } 
+        }
+
+        function renderTable() { 
+            progressTableBody.innerHTML = ''; 
+            const todayStr = getTodayDateString(); 
+            if (!state.plan) return; 
+            state.plan.forEach(day => { 
+                const isToday = day.date === todayStr; 
+                const rowClass = isToday ? 'bg-slate-700/50 font-semibold' : ''; 
+                let statusClass = ''; 
+                let statusText = translations[state.language].statusPending; 
+                if (day.status === 'Pass') { 
+                    statusClass = 'text-green-400'; 
+                    statusText = translations[state.language].statusPass; 
+                } else if (day.status === 'Fail') { 
+                    statusClass = 'text-red-400'; 
+                    statusText = translations[state.language].statusFail; 
+                } else if (day.status === 'Waiting') { 
+                    statusClass = 'text-amber-400'; 
+                    statusText = translations[state.language].statusWaiting; 
+                } 
+                const row = `<tr class="${rowClass}"><td class="py-3 px-2">${formatDate(day.date)}</td><td class="py-3 px-2 text-center">${day.target}</td><td class="py-3 px-2 text-center">${day.smoked}</td><td class="py-3 px-2 text-center font-semibold ${statusClass}">${statusText}</td></tr>`; 
+                progressTableBody.insertAdjacentHTML('beforeend', row); 
+            }); 
+        }
+
+        function render() { 
+            renderDashboard(); 
+            renderTable(); 
+        }
+
+        function startCountdown() { 
+            if (countdownInterval) clearInterval(countdownInterval); 
+            countdownInterval = setInterval(() => { 
+                const now = new Date(); 
+                const midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 0); 
+                const diff = midnight - now; 
+                if (diff <= 0) { 
+                    stopCountdown(); 
+                    location.reload(); 
+                    return; 
+                } 
+                const hours = String(Math.floor((diff / (1000 * 60 * 60)) % 24)).padStart(2, '0'); 
+                const minutes = String(Math.floor((diff / 1000 / 60) % 60)).padStart(2, '0'); 
+                const seconds = String(Math.floor((diff / 1000) % 60)).padStart(2, '0'); 
+                const countdownSpan = document.getElementById('countdown-timer'); 
+                if (countdownSpan) { 
+                    countdownSpan.textContent = `${hours}:${minutes}:${seconds}`; 
+                } 
+            }, 1000); 
+        }
+
+        function stopCountdown() { 
+            if (countdownInterval) { 
+                clearInterval(countdownInterval); 
+                countdownInterval = null; 
+            } 
+        }
+
         function showModal(title, text) {
             genericModalTitle.textContent = title;
             genericModalText.textContent = text;
@@ -486,28 +420,39 @@
             modal.querySelector('.modal-content').classList.remove('scale-100');
             modal.classList.add('hidden');
         }
-        
-        // --- All Other Functions (Firestore, Core Logic) remain largely the same ---
-        function signOutUser() { signOut(auth); }
-        async function saveStateToFirestore() { if (!currentUser) return; const planDocRef = doc(db, "plans", currentUser.uid); await setDoc(planDocRef, state); }
-        async function loadStateFromFirestore() { if (!currentUser) return; const planDocRef = doc(db, "plans", currentUser.uid); const docSnap = await getDoc(planDocRef); if (docSnap.exists()) { state = docSnap.data(); } else { state = { language: 'en', plan: [], startDate: null, initialCount: 0, lastCheckedDate: null }; } updateUIForLanguage(); }
-        async function startJourney(e) { e.preventDefault(); const count = parseInt(initialCigarettesInput.value); if (count > 0) { state.initialCount = count; state.startDate = getTodayDateString(); state.lastCheckedDate = getYesterdayDateString(); generatePlan(); await saveStateToFirestore(); showScreen('main'); render(); } }
-        async function toggleLanguage() { state.language = state.language === 'en' ? 'ta' : 'en'; await saveStateToFirestore(); updateUIForLanguage(); if (state.plan && state.plan.length > 0) { render(); } }
-        async function handleSmokedClick() { const todayEntry = getTodayEntry(); if (todayEntry && todayEntry.smoked < todayEntry.target) { todayEntry.smoked += 1; if (todayEntry.smoked >= todayEntry.target) { todayEntry.status = 'Waiting'; } await saveStateToFirestore(); render(); } }
-        async function checkDailyStatus() { const todayStr = getTodayDateString(); if(!state.plan || state.lastCheckedDate === todayStr) return; let showMotivation = false; let planUpdated = false; state.plan.forEach(day => { if (day.date < todayStr && (day.status === 'Pending' || day.status === 'Waiting')) { planUpdated = true; day.status = day.smoked <= day.target ? 'Pass' : 'Fail'; if (day.date === getYesterdayDateString() && day.status === 'Pass') { showMotivation = true; } } }); if (showMotivation) { showModal("Great Job Yesterday!", "Keep up the great work!"); } state.lastCheckedDate = todayStr; if(planUpdated) { await saveStateToFirestore(); } renderTable(); }
-        function generatePlan() { state.plan = []; let currentDate = new Date(); let weekCounter = 0; while(true) { const weekNumber = Math.floor(weekCounter / 7); const dailyTarget = Math.max(0, state.initialCount - 1 - weekNumber); state.plan.push({ date: toISODateString(currentDate), target: dailyTarget, smoked: 0, status: 'Pending' }); if (dailyTarget === 0) break; currentDate.setDate(currentDate.getDate() + 1); weekCounter++; } }
-        function renderDashboard() { const todayEntry = getTodayEntry(); if (todayEntry) { targetCountEl.textContent = todayEntry.target; smokedCountEl.textContent = todayEntry.smoked; const { smoked, target } = todayEntry; smokedCountEl.classList.remove('text-green-400', 'text-amber-400', 'text-red-400'); if (target > 0) { if (smoked <= target / 3) { smokedCountEl.classList.add('text-green-400'); } else if (smoked <= (target * 2) / 3) { smokedCountEl.classList.add('text-amber-400'); } else { smokedCountEl.classList.add('text-red-400'); } } else { smokedCountEl.classList.add('text-green-400'); } if (smoked >= target) { smokedButton.classList.add('hidden'); limitReachedControls.classList.remove('hidden'); limitReachedButton.innerHTML = translations[state.language].limitReachedText; startCountdown(); } else { smokedButton.classList.remove('hidden'); limitReachedControls.classList.add('hidden'); stopCountdown(); } } else { targetCountEl.textContent = '0'; smokedCountEl.textContent = '0'; smokedButton.classList.add('hidden'); } }
-        function renderTable() { progressTableBody.innerHTML = ''; const todayStr = getTodayDateString(); if (!state.plan) return; state.plan.forEach(day => { const isToday = day.date === todayStr; const rowClass = isToday ? 'bg-slate-700/50 font-semibold' : ''; let statusClass = ''; let statusText = translations[state.language].statusPending; if (day.status === 'Pass') { statusClass = 'text-green-400'; statusText = translations[state.language].statusPass; } else if (day.status === 'Fail') { statusClass = 'text-red-400'; statusText = translations[state.language].statusFail; } else if (day.status === 'Waiting') { statusClass = 'text-amber-400'; statusText = translations[state.language].statusWaiting; } const row = `<tr class="${rowClass}"><td class="py-3 px-2">${formatDate(day.date)}</td><td class="py-3 px-2 text-center">${day.target}</td><td class="py-3 px-2 text-center">${day.smoked}</td><td class="py-3 px-2 text-center font-semibold ${statusClass}">${statusText}</td></tr>`; progressTableBody.insertAdjacentHTML('beforeend', row); }); }
-        function render() { renderDashboard(); renderTable(); }
-        function startCountdown() { if (countdownInterval) clearInterval(countdownInterval); countdownInterval = setInterval(() => { const now = new Date(); const midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 0); const diff = midnight - now; if (diff <= 0) { stopCountdown(); location.reload(); return; } const hours = String(Math.floor((diff / (1000 * 60 * 60)) % 24)).padStart(2, '0'); const minutes = String(Math.floor((diff / 1000 / 60) % 60)).padStart(2, '0'); const seconds = String(Math.floor((diff / 1000) % 60)).padStart(2, '0'); const countdownSpan = document.getElementById('countdown-timer'); if (countdownSpan) { countdownSpan.textContent = `${hours}:${minutes}:${seconds}`; } }, 1000); }
-        function stopCountdown() { if (countdownInterval) { clearInterval(countdownInterval); countdownInterval = null; } }
+
         function showUrgeModal() { /* ... */ }
+
+        function saveState() {
+            localStorage.setItem('smokeFreeJourneyState', JSON.stringify(state));
+        }
+
+        function loadState() {
+            const savedState = localStorage.getItem('smokeFreeJourneyState');
+            if (savedState) {
+                state = JSON.parse(savedState);
+            } else {
+                state = { language: 'en', plan: [], startDate: null, initialCount: 0, lastCheckedDate: null };
+            }
+        }
+        
         function getTodayEntry() { if (!state.plan) return null; return state.plan.find(day => day.date === getTodayDateString()); }
         function getTodayDateString() { return toISODateString(new Date()); }
         function getYesterdayDateString() { const yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1); return toISODateString(yesterday); }
         function toISODateString(date) { return date.toISOString().split('T')[0]; }
         function formatDate(dateString) { const date = new Date(dateString); const options = { month: 'short', day: 'numeric' }; return date.toLocaleDateString(state.language === 'ta' ? 'ta-IN' : 'en-US', options); }
-        function updateUIForLanguage() { languageSwitcher.textContent = state.language === 'en' ? 'தமிழ்' : 'English'; document.querySelectorAll('[data-translate]').forEach(el => { const key = el.getAttribute('data-translate'); if (translations[state.language][key]) { el.textContent = translations[state.language][key]; } }); runningMessageEl.textContent = translations[state.language].runningMessage; }
+        function updateUIForLanguage() { 
+            languageSwitcher.textContent = state.language === 'en' ? 'தமிழ்' : 'English'; 
+            document.querySelectorAll('[data-translate]').forEach(el => { 
+                const key = el.getAttribute('data-translate'); 
+                if (translations[state.language] && translations[state.language][key]) { 
+                    el.textContent = translations[state.language][key]; 
+                } 
+            }); 
+            if (translations[state.language]) {
+                runningMessageEl.textContent = translations[state.language].runningMessage;
+            }
+        }
         
         init();
     </script>
