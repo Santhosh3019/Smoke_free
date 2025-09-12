@@ -7,13 +7,12 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            -webkit-tap-highlight-color: transparent; /* Disable tap highlight on mobile */
+            -webkit-tap-highlight-color: transparent;
         }
-        /* Custom styles for smooth transitions and better UX */
         .fade-in {
             animation: fadeIn 0.5s ease-in-out;
         }
@@ -27,31 +26,55 @@
         .modal-content {
             transition: transform 0.3s ease-in-out;
         }
+        .marquee-container {
+            overflow: hidden;
+            white-space: nowrap;
+        }
+        .marquee-text {
+            display: inline-block;
+            padding-left: 100%;
+            animation: marquee 25s linear infinite;
+        }
+        @keyframes marquee {
+            0%   { transform: translateX(0); }
+            100% { transform: translateX(-100%); }
+        }
+        /* Professional scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #4A5568;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #718096;
+        }
     </style>
 </head>
-<body class="bg-slate-900 text-white antialiased">
+<body class="bg-gradient-to-br from-slate-900 to-gray-900 text-slate-200 antialiased">
 
     <!-- Main Container -->
     <div id="app-container" class="min-h-screen max-w-lg mx-auto p-4 flex flex-col fade-in">
         
         <!-- Header -->
-        <header class="flex justify-between items-center mb-6">
-            <h1 class="text-2xl font-bold text-cyan-400" data-translate="appTitle">Smoke-Free Journey</h1>
-            <div class="flex items-center space-x-4">
-                <button id="header-reset-button" class="text-xs text-slate-400 hover:text-white transition-colors" data-translate="resetButton">Start Over</button>
-                <button id="language-switcher" class="px-3 py-1 text-sm font-semibold bg-slate-700 rounded-full hover:bg-slate-600 transition-colors">தமிழ்</button>
-            </div>
+        <header class="flex justify-between items-center mb-6 pb-4 border-b border-slate-700/50">
+            <h1 class="text-2xl font-bold text-cyan-400 tracking-wide" data-translate="appTitle">Smoke-Free Journey</h1>
+            <button id="language-switcher" class="px-3 py-1 text-sm font-semibold bg-slate-800 rounded-full hover:bg-slate-700 transition-colors shadow-md">தமிழ்</button>
         </header>
 
         <!-- Initial Setup Screen -->
         <div id="setup-screen" class="flex-grow flex flex-col justify-center items-center text-center p-4">
-            <div class="w-full">
+            <div class="w-full bg-slate-800/50 p-8 rounded-2xl shadow-2xl">
                 <h2 class="text-3xl font-bold mb-2" data-translate="welcomeTitle">Welcome!</h2>
                 <p class="text-slate-400 mb-8" data-translate="welcomeSubtitle">Let's start your journey to a smoke-free life.</p>
-                <form id="setup-form" class="space-y-4">
+                <form id="setup-form" class="space-y-6">
                     <label for="initial-cigarettes" class="block text-lg font-medium mb-2" data-translate="initialCigarettesLabel">How many cigarettes do you smoke per day?</label>
-                    <input type="number" id="initial-cigarettes" class="w-full bg-slate-800 border-2 border-slate-600 text-white text-center text-2xl rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500" placeholder="e.g., 15" required min="1">
-                    <button type="submit" class="w-full bg-cyan-500 hover:bg-cyan-600 text-slate-900 font-bold py-3 px-4 rounded-lg transition-transform transform hover:scale-105" data-translate="startButton">Start Journey</button>
+                    <input type="number" id="initial-cigarettes" class="w-full bg-slate-900 border-2 border-slate-700 text-white text-center text-3xl rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition" placeholder="e.g., 15" required min="1">
+                    <button type="submit" class="w-full bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white font-bold py-3 px-4 rounded-lg transition-transform transform hover:scale-105 shadow-lg shadow-cyan-500/20" data-translate="startButton">Start Journey</button>
                 </form>
             </div>
         </div>
@@ -60,28 +83,39 @@
         <div id="main-screen" class="hidden flex-grow flex flex-col">
             <!-- Dashboard -->
             <div class="grid grid-cols-2 gap-4 mb-6 text-center">
-                <div class="bg-slate-800 p-4 rounded-xl">
-                    <p class="text-sm text-slate-400" data-translate="todaysTarget">Today's Target</p>
-                    <p id="target-count" class="text-4xl font-bold text-green-400">14</p>
+                <div class="bg-slate-800/70 p-4 rounded-xl shadow-lg flex items-center justify-center space-x-4">
+                    <svg class="w-8 h-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                    <div>
+                        <p class="text-sm text-slate-400" data-translate="todaysTarget">Today's Target</p>
+                        <p id="target-count" class="text-4xl font-bold text-green-400">14</p>
+                    </div>
                 </div>
-                <div class="bg-slate-800 p-4 rounded-xl">
-                    <p class="text-sm text-slate-400" data-translate="smokedToday">Smoked Today</p>
-                    <p id="smoked-count" class="text-4xl font-bold text-amber-400">0</p>
+                <div class="bg-slate-800/70 p-4 rounded-xl shadow-lg flex items-center justify-center space-x-4">
+                     <svg class="w-8 h-8 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.657 7.343A8 8 0 0117.657 18.657z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.343 17.657a8 8 0 0110.607-10.607L15 12l-4.657 5.657z"></path></svg>
+                    <div>
+                        <p class="text-sm text-slate-400" data-translate="smokedToday">Smoked Today</p>
+                        <p id="smoked-count" class="text-4xl font-bold">0</p>
+                    </div>
                 </div>
             </div>
 
-            <!-- Action Button -->
-            <button id="smoked-button" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-4 px-4 rounded-lg text-lg mb-6 transition-transform transform hover:scale-105 shadow-lg" data-translate="smokedButton">I Smoked a Cigarette</button>
-
-            <!-- Time Limit Message -->
-            <div id="time-limit-message" class="hidden text-center bg-slate-800 p-3 rounded-lg mb-6">
-                <p class="font-semibold text-amber-400" data-translate="limitReached">You've reached your limit for today.</p>
-                <p class="text-sm text-slate-400" data-translate="limitReachedSub">Your next cigarette is available tomorrow. You can do this!</p>
+            <!-- Action Buttons -->
+            <div class="mb-6 space-y-3">
+                <button id="smoked-button" class="w-full bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-700 hover:to-red-700 text-white font-bold py-4 px-4 rounded-lg text-lg transition-transform transform hover:scale-105 shadow-lg shadow-red-500/20" data-translate="smokedButton">I Smoked a Cigarette</button>
+                <div id="limit-reached-controls" class="hidden grid grid-cols-2 gap-3">
+                    <button id="limit-reached-button" class="w-full bg-slate-800 text-amber-400 font-bold py-3 px-4 rounded-lg text-sm text-center shadow-md"></button>
+                    <button id="urge-button" class="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white font-bold py-3 px-4 rounded-lg text-sm text-center shadow-lg shadow-cyan-500/20" data-translate="urgeButton">Had an Urge?</button>
+                </div>
+            </div>
+            
+            <!-- Running Message -->
+            <div class="bg-slate-800/50 rounded-lg p-2 mb-6 marquee-container shadow-md">
+                 <p id="running-message" class="text-cyan-300 text-sm marquee-text"></p>
             </div>
 
             <!-- Progress Log -->
-            <div class="flex-grow bg-slate-800 rounded-xl p-4 overflow-y-auto">
-                <h3 class="text-lg font-bold mb-4" data-translate="progressLogTitle">Progress Log</h3>
+            <div class="flex-grow bg-slate-800/50 rounded-xl p-4 overflow-y-auto shadow-inner">
+                <h3 class="text-lg font-bold mb-4 text-slate-300" data-translate="progressLogTitle">Progress Log</h3>
                 <div class="overflow-x-auto">
                     <table class="w-full text-sm text-left">
                         <thead class="text-xs text-slate-400 uppercase">
@@ -92,17 +126,9 @@
                                 <th scope="col" class="py-3 px-2 text-center" data-translate="statusHeader">Status</th>
                             </tr>
                         </thead>
-                        <tbody id="progress-table-body">
-                            <!-- Rows will be injected by JavaScript -->
-                        </tbody>
+                        <tbody id="progress-table-body" class="divide-y divide-slate-700/50"></tbody>
                     </table>
                 </div>
-            </div>
-             <!-- Identity Quote -->
-            <div class="mt-6 text-center bg-slate-800 p-4 rounded-xl border-l-4 border-cyan-400">
-                <p class="text-sm text-slate-300 italic" data-translate="identityQuote">
-                    "Most self-control problems are identity problems. It's easier to stop smoking when you see yourself as a non-smoker, than as a smoker trying to quit."
-                </p>
             </div>
         </div>
         
@@ -110,38 +136,13 @@
         <div id="congrats-screen" class="hidden flex-grow flex flex-col justify-center items-center text-center p-4">
              <div class="text-7xl mb-4">🎉</div>
              <h2 class="text-4xl font-bold text-green-400 mb-2" data-translate="congratsTitle">Congratulations!</h2>
-             <p class="text-slate-300 mb-8" data-translate="congratsSubtitle">You have completed your journey and are now smoke-free! We are proud of you.</p>
-             <button id="restart-journey-button" class="w-full bg-cyan-500 hover:bg-cyan-600 text-slate-900 font-bold py-3 px-4 rounded-lg" data-translate="restartButton">Start a New Journey</button>
-        </div>
-
-    </div>
-
-    <!-- Modals -->
-    <!-- Mindfulness/Intervention Modal -->
-    <div id="mindfulness-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 hidden modal-overlay">
-        <div class="bg-slate-800 rounded-2xl p-6 w-full max-w-sm mx-auto modal-content transform scale-95">
-            <div id="mindfulness-phase-1">
-                <h3 class="text-xl font-bold mb-4 text-amber-400" data-translate="mindfulnessPhase1Title">Before you smoke...</h3>
-                <p class="text-slate-300 mb-6" data-translate="mindfulnessPhase1Text">Take a moment. Can you wait just 5 minutes? Try a glass of water or a few deep breaths first. This craving will pass.</p>
-                <button id="mindfulness-continue-1" class="w-full bg-cyan-500 hover:bg-cyan-600 text-slate-900 font-bold py-2 px-4 rounded-lg" data-translate="mindfulnessContinueButton">Continue</button>
-            </div>
-            <div id="mindfulness-phase-2" class="hidden">
-                <h3 class="text-xl font-bold mb-4 text-amber-400" data-translate="mindfulnessPhase2Title">As you smoke...</h3>
-                <p class="text-slate-300 mb-6" data-translate="mindfulnessPhase2Text">Notice the first 2-3 puffs. What do you truly feel? Is it pleasant? Think about the chemicals entering your body.</p>
-                 <button id="mindfulness-continue-2" class="w-full bg-cyan-500 hover:bg-cyan-600 text-slate-900 font-bold py-2 px-4 rounded-lg" data-translate="mindfulnessContinueButton">Continue</button>
-            </div>
-            <div id="mindfulness-phase-3" class="hidden">
-                <h3 class="text-xl font-bold mb-4 text-amber-400" data-translate="mindfulnessPhase3Title">After you smoke...</h3>
-                <p class="text-slate-300 mb-4" data-translate="mindfulnessPhase3Text">What did you gain? If it was a feeling of relaxation, acknowledge it.</p>
-                <p class="bg-slate-700 p-3 rounded-lg text-slate-300 text-sm mb-6" data-translate="mindfulnessPhase3Insight">That feeling is normal. But remember, a cigarette is not the only way to relax. Let's find healthier ways together.</p>
-                <button onclick="closeModal('mindfulness-modal')" class="w-full bg-slate-600 hover:bg-slate-700 font-bold py-2 px-4 rounded-lg" data-translate="mindfulnessCloseButton">I Understand</button>
-            </div>
+             <p class="text-slate-300 mb-8 max-w-md" data-translate="congratsSubtitle">You have completed your journey and are now smoke-free! We are proud of you.</p>
         </div>
     </div>
     
-    <!-- Motivation Modal -->
-    <div id="motivation-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 hidden modal-overlay">
-        <div class="bg-slate-800 rounded-2xl p-6 w-full max-w-sm mx-auto text-center modal-content transform scale-95">
+    <!-- Modals -->
+    <div id="motivation-modal" class="fixed inset-0 bg-black bg-opacity-75 backdrop-blur-sm flex items-center justify-center p-4 hidden modal-overlay">
+        <div class="bg-slate-800 rounded-2xl p-6 w-full max-w-sm mx-auto text-center modal-content transform scale-95 shadow-2xl border border-slate-700">
              <div class="text-5xl mb-4">🌟</div>
             <h3 class="text-xl font-bold mb-4 text-green-400" data-translate="motivationTitle">Great Job Yesterday!</h3>
             <p id="motivation-quote" class="text-slate-300 italic mb-6">"The secret of getting ahead is getting started."</p>
@@ -149,10 +150,17 @@
         </div>
     </div>
 
+    <div id="urge-modal" class="fixed inset-0 bg-black bg-opacity-75 backdrop-blur-sm flex items-center justify-center p-4 hidden modal-overlay">
+        <div class="bg-slate-800 rounded-2xl p-6 w-full max-w-sm mx-auto text-center modal-content transform scale-95 shadow-2xl border border-slate-700">
+             <div class="text-5xl mb-4">💪</div>
+            <h3 class="text-xl font-bold mb-4 text-cyan-400" data-translate="urgeTitle">Stay Strong!</h3>
+            <p id="urge-quote" class="text-slate-300 mb-6">"A craving is just a thought. You are in control, not the thought."</p>
+            <button onclick="closeModal('urge-modal')" class="w-full bg-cyan-500 hover:bg-cyan-600 text-slate-900 font-bold py-2 px-4 rounded-lg" data-translate="urgeCloseButton">I Can Do This!</button>
+        </div>
+    </div>
 
     <script>
         // --- DOM Elements ---
-        const appContainer = document.getElementById('app-container');
         const setupScreen = document.getElementById('setup-screen');
         const mainScreen = document.getElementById('main-screen');
         const congratsScreen = document.getElementById('congrats-screen');
@@ -162,31 +170,23 @@
         const targetCountEl = document.getElementById('target-count');
         const smokedCountEl = document.getElementById('smoked-count');
         const smokedButton = document.getElementById('smoked-button');
-        const timeLimitMessage = document.getElementById('time-limit-message');
+        const limitReachedControls = document.getElementById('limit-reached-controls');
+        const limitReachedButton = document.getElementById('limit-reached-button');
+        const urgeButton = document.getElementById('urge-button');
+        const runningMessageEl = document.getElementById('running-message');
         const progressTableBody = document.getElementById('progress-table-body');
-        const headerResetButton = document.getElementById('header-reset-button');
-        const restartJourneyButton = document.getElementById('restart-journey-button');
         
-        // Modals
-        const mindfulnessModal = document.getElementById('mindfulness-modal');
-        const mindfulnessPhase1 = document.getElementById('mindfulness-phase-1');
-        const mindfulnessPhase2 = document.getElementById('mindfulness-phase-2');
-        const mindfulnessPhase3 = document.getElementById('mindfulness-phase-3');
-        const mindfulnessContinue1 = document.getElementById('mindfulness-continue-1');
-        const mindfulnessContinue2 = document.getElementById('mindfulness-continue-2');
         const motivationModal = document.getElementById('motivation-modal');
         const motivationQuoteEl = document.getElementById('motivation-quote');
+        const urgeModal = document.getElementById('urge-modal');
+        const urgeQuoteEl = document.getElementById('urge-quote');
 
         // --- App State ---
-        let state = {
-            language: 'en',
-            plan: [],
-            startDate: null,
-            initialCount: 0,
-            lastCheckedDate: null
-        };
+        let state = { language: 'en', plan: [], startDate: null, initialCount: 0, lastCheckedDate: null };
+        let countdownInterval = null;
+        let lastUrgeTipIndex = -1;
         
-        // --- Translations & Quotes ---
+        // --- Translations, Quotes & Messages ---
         const translations = {
             en: {
                 appTitle: "Smoke-Free Journey",
@@ -197,32 +197,36 @@
                 todaysTarget: "Today's Target",
                 smokedToday: "Smoked Today",
                 smokedButton: "I Smoked a Cigarette",
-                limitReached: "You've reached your limit for today.",
-                limitReachedSub: "Your next cigarette is available tomorrow. You can do this!",
                 progressLogTitle: "Progress Log",
                 dateHeader: "Date",
                 targetHeader: "Target",
                 smokedHeader: "Smoked",
                 statusHeader: "Status",
-                resetButton: "Start Over",
-                mindfulnessPhase1Title: "Before you smoke...",
-                mindfulnessPhase1Text: "Take a moment. Can you wait just 5 minutes? Try a glass of water or a few deep breaths first. This craving will pass.",
-                mindfulnessContinueButton: "Continue",
-                mindfulnessPhase2Title: "As you smoke...",
-                mindfulnessPhase2Text: "Notice the first 2-3 puffs. What do you truly feel? Is it pleasant? Think about the chemicals entering your body.",
-                mindfulnessPhase3Title: "After you smoke...",
-                mindfulnessPhase3Text: "What did you gain? If it was a feeling of relaxation, acknowledge it.",
-                mindfulnessPhase3Insight: "That feeling is normal. But remember, a cigarette is not the only way to relax. Let's find healthier ways together.",
-                mindfulnessCloseButton: "I Understand",
                 motivationTitle: "Great Job Yesterday!",
                 motivationKeepGoingButton: "Keep Going!",
                 congratsTitle: "Congratulations!",
                 congratsSubtitle: "You have completed your journey and are now smoke-free! We are proud of you.",
-                restartButton: "Start a New Journey",
-                identityQuote: "Most self-control problems are identity problems. It's easier to stop smoking when you see yourself as a non-smoker, rather than as a smoker 'trying to quit'.",
+                runningMessage: "Don't be a slave to a stick of paper and leaves. Break the chains with every craving you conquer.",
+                urgeButton: "Had an Urge?",
+                urgeTitle: "Stay Strong!",
+                urgeCloseButton: "I Can Do This!",
+                limitReachedText: "Next in <span id='countdown-timer' class='text-white'>--:--:--</span>",
+                urgeTips: [
+                    "Take a deep breath and a sip of cold water. Wait 5 minutes, the feeling will pass.",
+                    "Eat something you like! A healthy snack can distract you and satisfy cravings.",
+                    "Successful people are self-controlled. If you can control this, you can achieve anything.",
+                    "Think about why you started. Don't give up on that goal now.",
+                    "Go for a short walk. Changing your environment can break the craving cycle.",
+                    "Chew on some sugar-free gum or a healthy snack. The act of chewing can relieve stress.",
+                    "Listen to your favorite song. Music can instantly lift your mood and distract you from cravings.",
+                    "Text or call a friend or family member for support. A quick chat can make a big difference.",
+                    "Remind yourself of the money you're saving. Think about what you can buy with it.",
+                    "Play a quick game on your phone. Engaging your mind can help the craving pass."
+                ],
                 statusPass: "Pass",
                 statusFail: "Fail",
-                statusPending: "Pending"
+                statusPending: "Pending",
+                statusWaiting: "Wait"
             },
             ta: {
                 appTitle: "புகைப்பிடிக்காத பயணம்",
@@ -233,49 +237,45 @@
                 todaysTarget: "இன்றைய இலக்கு",
                 smokedToday: "இன்று புகைத்தது",
                 smokedButton: "நான் ஒரு சிகரெட் பிடித்தேன்",
-                limitReached: "இன்றைய வரம்பை நீங்கள் அடைந்துவிட்டீர்கள்.",
-                limitReachedSub: "உங்கள் அடுத்த சிகரெட் நாளை கிடைக்கும். உங்களால் முடியும்!",
                 progressLogTitle: "முன்னேற்றப் பதிவு",
                 dateHeader: "தேதி",
                 targetHeader: "இலக்கு",
                 smokedHeader: "புகைத்தது",
                 statusHeader: "நிலை",
-                resetButton: "மீண்டும் தொடங்கு",
-                mindfulnessPhase1Title: "புகைப்பதற்கு முன்...",
-                mindfulnessPhase1Text: "ஒரு நிமிடம். 5 நிமிடங்கள் காத்திருக்க முடியுமா? ஒரு கிளாஸ் தண்ணீர் அல்லது சில ஆழ்ந்த சுவாசங்களை முயற்சிக்கவும். இந்த ஏக்கம் கடந்து போகும்.",
-                mindfulnessContinueButton: "தொடர்க",
-                mindfulnessPhase2Title: "நீங்கள் புகைக்கும்போது...",
-                mindfulnessPhase2Text: "முதல் 2-3 புகைகளை கவனியுங்கள். நீங்கள் உண்மையிலேயே என்ன உணர்கிறீர்கள்? அது இனிமையானதா? உங்கள் உடலில் நுழையும் இரசாயனங்களைப் பற்றி சிந்தியுங்கள்.",
-                mindfulnessPhase3Title: "நீங்கள் புகைத்த பிறகு...",
-                mindfulnessPhase3Text: "நீங்கள் என்ன பெற்றீர்கள்? அது ஓய்வு உணர்வாக இருந்தால், அதை ஒப்புக்கொள்ளுங்கள்.",
-                mindfulnessPhase3Insight: "அந்த உணர்வு இயல்பானது. ஆனால் நினைவில் கொள்ளுங்கள், ஓய்வெடுக்க சிகரெட் ஒரே வழி அல்ல. ஆரோக்கியமான வழிகளை ஒன்றாகக் கண்டுபிடிப்போம்.",
-                mindfulnessCloseButton: "எனக்கு புரிகிறது",
                 motivationTitle: "நேற்று சிறப்பாக செய்தீர்கள்!",
                 motivationKeepGoingButton: "தொடர்ந்து முன்னேறு!",
                 congratsTitle: "வாழ்த்துக்கள்!",
                 congratsSubtitle: "உங்கள் பயணத்தை வெற்றிகரமாக முடித்துவிட்டீர்கள், இப்போது நீங்கள் புகைப்பிடிக்காதவர்! உங்களை நினைத்து நாங்கள் பெருமைப்படுகிறோம்.",
-                restartButton: "புதிய பயணத்தைத் தொடங்குங்கள்",
-                identityQuote: "பெரும்பாலான சுயக்கட்டுப்பாட்டுச் சிக்கல்கள் அடையாளச் சிக்கல்களே. 'விட முயற்சிக்கும்' புகைப்பிடிப்பவராக உங்களைப் பார்ப்பதை விட, புகைப்பிடிக்காதவராக உங்களைப் பார்க்கும்போது புகைப்பதை நிறுத்துவது எளிது.",
+                runningMessage: "ஒரு காகிதத்திற்கும் இலைகளுக்கும் அடிமையாக இருக்காதீர்கள். நீங்கள் வெல்லும் ஒவ்வொரு ஏக்கத்துடனும் சங்கிலிகளை உடைக்கவும்.",
+                urgeButton: "ஒரு ஆசையா?",
+                urgeTitle: "திடமாக இருங்கள்!",
+                urgeCloseButton: "என்னால் முடியும்!",
+                limitReachedText: "அடுத்து <span id='countdown-timer' class='text-white'>--:--:--</span>",
+                urgeTips: [
+                    "ஆழ்ந்த மூச்சு விடுங்கள், குளிர் நீர் குடியுங்கள். 5 நிமிடங்கள் காத்திருங்கள், அந்த உணர்வு கடந்து போகும்.",
+                    "உங்களுக்குப் பிடித்த ஒன்றைச் சாப்பிடுங்கள்! ஒரு சிற்றுண்டி உங்கள் கவனத்தை திசை திருப்பும்.",
+                    "வெற்றியாளர்கள் தன்னடக்கம் கொண்டவர்கள். இதை உங்களால் கட்டுப்படுத்த முடிந்தால், எதையும் சாதிக்க முடியும்.",
+                    "ஏன் ஆரம்பித்தீர்கள் என்று சிந்தியுங்கள். அந்த இலக்கை இப்போது கைவிடாதீர்கள்.",
+                    "ஒரு சிறிய நடைப்பயிற்சி செல்லுங்கள். உங்கள் சூழலை மாற்றுவது ஆசையின் சுழற்சியை உடைக்கும்.",
+                    "சர்க்கரை இல்லாத பபுள் கம் அல்லது ஆரோக்கியமான சிற்றுண்டியை மெல்லுங்கள். மெல்லும் செயல் மன அழுத்தத்தைக் குறைக்கும்.",
+                    "உங்களுக்குப் பிடித்த பாடலைக் கேளுங்கள். இசை உங்கள் மனநிலையை உடனடியாக உயர்த்தி, ஆசைகளிலிருந்து திசை திருப்பும்.",
+                    "ஆதரவிற்காக ஒரு நண்பர் அல்லது குடும்ப உறுப்பினருக்கு மெசேஜ் அல்லது கால் செய்யுங்கள். ஒரு சிறிய உரையாடல் பெரிய மாற்றத்தை ஏற்படுத்தும்.",
+                    "நீங்கள் சேமிக்கும் பணத்தை நீங்களே நினைவுபடுத்திக் கொள்ளுங்கள். அதைக் கொண்டு என்ன வாங்கலாம் என்று சிந்தியுங்கள்.",
+                    "உங்கள் தொலைபேசியில் ஒரு விரைவான விளையாட்டை விளையாடுங்கள். உங்கள் மனதை ஈடுபடுத்துவது ஆசை கடந்து செல்ல உதவும்."
+                ],
                 statusPass: "வெற்றி",
                 statusFail: "தோல்வி",
-                statusPending: "நிலுவையில்"
+                statusPending: "நிலுவையில்",
+                statusWaiting: "காத்திரு"
             }
         };
 
         const quotes = {
-            en: [
-                "Believe you can and you're halfway there.", "The first step to getting anywhere is deciding you're not going to stay where you are.", "It does not matter how slowly you go as long as you do not stop.", "Success is the sum of small efforts, repeated day in and day out.", "The only person you are destined to become is the person you decide to be."
-            ],
-            ta: [
-                "முடியும் என்று நம்புங்கள், நீங்கள் பாதி தூரம் கடந்துவிட்டீர்கள்.", "எங்கும் செல்வதற்கான முதல் படி, நீங்கள் இருக்கும் இடத்தில் இருக்கப் போவதில்லை என்று முடிவு செய்வதே.", "நீங்கள் நிறுத்தாத வரை எவ்வளவு மெதுவாகச் சென்றாலும் பரவாயில்லை.", "வெற்றி என்பது தினசரி மீண்டும் மீண்டும் செய்யப்படும் சிறு முயற்சிகளின் கூட்டுத்தொகை.", "நீங்கள் ஆக வேண்டும் என்று விதிக்கப்பட்ட ஒரே நபர், நீங்கள் ஆக முடிவு செய்யும் நபரே."
-            ]
+            en: [ "Believe you can and you're halfway there.", "It does not matter how slowly you go as long as you do not stop.", "Success is the sum of small efforts, repeated day in and day out." ],
+            ta: [ "முடியும் என்று நம்புங்கள், நீங்கள் பாதி தூரம் கடந்துவிட்டீர்கள்.", "நீங்கள் நிறுத்தாத வரை எவ்வளவு மெதுவாகச் சென்றாலும் பரவாயில்லை.", "வெற்றி என்பது தினசரி மீண்டும் மீண்டும் செய்யப்படும் சிறு முயற்சிகளின் கூட்டுத்தொகை." ]
         };
 
         // --- Core Functions ---
-
-        /**
-         * Initializes the application, loads state, and sets up initial view.
-         */
         function init() {
             loadState();
             updateUIForLanguage();
@@ -292,46 +292,25 @@
             } else {
                 showScreen('setup');
             }
-            
             setupEventListeners();
         }
 
-        /**
-         * Sets up all the event listeners for the application.
-         */
         function setupEventListeners() {
             languageSwitcher.addEventListener('click', toggleLanguage);
             setupForm.addEventListener('submit', startJourney);
             smokedButton.addEventListener('click', handleSmokedClick);
-            headerResetButton.addEventListener('click', resetJourney);
-            restartJourneyButton.addEventListener('click', resetJourney);
-
-            // Mindfulness modal flow
-            mindfulnessContinue1.addEventListener('click', () => {
-                mindfulnessPhase1.classList.add('hidden');
-                mindfulnessPhase2.classList.remove('hidden');
-            });
-             mindfulnessContinue2.addEventListener('click', () => {
-                mindfulnessPhase2.classList.add('hidden');
-                mindfulnessPhase3.classList.remove('hidden');
-            });
+            urgeButton.addEventListener('click', showUrgeModal);
         }
         
-        /**
-         * Switches the application language between English and Tamil.
-         */
         function toggleLanguage() {
             state.language = state.language === 'en' ? 'ta' : 'en';
             saveState();
             updateUIForLanguage();
             if (state.plan.length > 0) {
-                renderTable(); // Re-render table for status text
+                render(); 
             }
         }
         
-        /**
-         * Updates all UI text elements based on the current language.
-         */
         function updateUIForLanguage() {
             languageSwitcher.textContent = state.language === 'en' ? 'தமிழ்' : 'English';
             document.querySelectorAll('[data-translate]').forEach(el => {
@@ -340,19 +319,16 @@
                     el.textContent = translations[state.language][key];
                 }
             });
+            runningMessageEl.textContent = translations[state.language].runningMessage;
         }
 
-        /**
-         * Handles the initial setup form submission.
-         * @param {Event} e The form submission event.
-         */
         function startJourney(e) {
             e.preventDefault();
             const count = parseInt(initialCigarettesInput.value);
             if (count > 0) {
                 state.initialCount = count;
                 state.startDate = getTodayDateString();
-                state.lastCheckedDate = getYesterdayDateString(); // To trigger motivation on first day
+                state.lastCheckedDate = getYesterdayDateString(); 
                 generatePlan();
                 saveState();
                 showScreen('main');
@@ -360,16 +336,12 @@
             }
         }
 
-        /**
-         * Generates the entire smoking reduction plan.
-         */
         function generatePlan() {
             state.plan = [];
-            let currentTarget = state.initialCount;
             let currentDate = new Date();
             let weekCounter = 0;
             
-            while(currentTarget > 0) {
+            while(true) {
                 const weekNumber = Math.floor(weekCounter / 7);
                 const dailyTarget = Math.max(0, state.initialCount - 1 - weekNumber);
                 
@@ -377,7 +349,7 @@
                     date: toISODateString(currentDate),
                     target: dailyTarget,
                     smoked: 0,
-                    status: 'Pending' // Pending, Pass, Fail
+                    status: 'Pending'
                 });
 
                 if (dailyTarget === 0) break;
@@ -387,75 +359,79 @@
             }
         }
 
-        /**
-         * Handles the click event for the "I Smoked" button.
-         */
         function handleSmokedClick() {
             const todayEntry = getTodayEntry();
-            if (todayEntry) {
-                if(todayEntry.smoked < todayEntry.target) {
-                    showMindfulnessModal(); // Show intervention before incrementing
-                    todayEntry.smoked += 1;
-                    saveState();
-                    render();
-                } 
+            if (todayEntry && todayEntry.smoked < todayEntry.target) {
+                todayEntry.smoked += 1;
+                if (todayEntry.smoked >= todayEntry.target) {
+                    todayEntry.status = 'Waiting';
+                }
+                saveState();
+                render();
             }
         }
 
-        /**
-         * Renders all dynamic parts of the main screen.
-         */
         function render() {
             renderDashboard();
             renderTable();
         }
 
-        /**
-         * Updates the dashboard with today's counts.
-         */
         function renderDashboard() {
             const todayEntry = getTodayEntry();
             if (todayEntry) {
                 targetCountEl.textContent = todayEntry.target;
                 smokedCountEl.textContent = todayEntry.smoked;
-                
-                if (todayEntry.smoked >= todayEntry.target) {
-                    smokedButton.disabled = true;
-                    smokedButton.classList.add('opacity-50', 'cursor-not-allowed');
-                    timeLimitMessage.classList.remove('hidden');
+
+                const { smoked, target } = todayEntry;
+                smokedCountEl.classList.remove('text-green-400', 'text-amber-400', 'text-red-400');
+                if (target > 0) {
+                    if (smoked <= target / 3) {
+                        smokedCountEl.classList.add('text-green-400');
+                    } else if (smoked <= (target * 2) / 3) {
+                        smokedCountEl.classList.add('text-amber-400');
+                    } else {
+                        smokedCountEl.classList.add('text-red-400');
+                    }
                 } else {
-                    smokedButton.disabled = false;
-                    smokedButton.classList.remove('opacity-50', 'cursor-not-allowed');
-                    timeLimitMessage.classList.add('hidden');
+                     smokedCountEl.classList.add('text-green-400');
+                }
+                
+                if (smoked >= target) {
+                    smokedButton.classList.add('hidden');
+                    limitReachedControls.classList.remove('hidden');
+                    limitReachedButton.innerHTML = translations[state.language].limitReachedText;
+                    startCountdown();
+                } else {
+                    smokedButton.classList.remove('hidden');
+                    limitReachedControls.classList.add('hidden');
+                    stopCountdown();
                 }
             } else {
-                 // Plan is over or something is wrong
                 targetCountEl.textContent = '0';
                 smokedCountEl.textContent = '0';
-                smokedButton.disabled = true;
-                smokedButton.classList.add('opacity-50', 'cursor-not-allowed');
+                smokedButton.classList.add('hidden');
             }
         }
         
-        /**
-         * Renders the progress log table.
-         */
         function renderTable() {
             progressTableBody.innerHTML = '';
             const todayStr = getTodayDateString();
             state.plan.forEach(day => {
                 const isToday = day.date === todayStr;
-                const rowClass = isToday ? 'bg-slate-700 font-bold' : '';
+                const rowClass = isToday ? 'bg-slate-700/50 font-semibold' : '';
                 
                 let statusClass = '';
-                let statusText = translations[state.language].statusPending || 'Pending';
+                let statusText = translations[state.language].statusPending;
                 
                 if (day.status === 'Pass') {
                     statusClass = 'text-green-400';
-                    statusText = translations[state.language].statusPass || 'Pass';
+                    statusText = translations[state.language].statusPass;
                 } else if (day.status === 'Fail') {
                     statusClass = 'text-red-400';
-                    statusText = translations[state.language].statusFail || 'Fail';
+                    statusText = translations[state.language].statusFail;
+                } else if (day.status === 'Waiting') {
+                    statusClass = 'text-amber-400';
+                    statusText = translations[state.language].statusWaiting;
                 }
 
                 const row = `
@@ -466,22 +442,18 @@
                         <td class="py-3 px-2 text-center font-semibold ${statusClass}">${statusText}</td>
                     </tr>
                 `;
-                progressTableBody.innerHTML += row;
+                progressTableBody.insertAdjacentHTML('beforeend', row);
             });
         }
         
-        /**
-         * Checks the status of previous days and shows motivation if applicable.
-         */
         function checkDailyStatus() {
             const todayStr = getTodayDateString();
-            if(state.lastCheckedDate === todayStr) return; // Already checked today
+            if(state.lastCheckedDate === todayStr) return;
             
             let showMotivation = false;
             
             state.plan.forEach(day => {
-                // Check and update status for all days before today
-                if (day.date < todayStr && day.status === 'Pending') {
+                if (day.date < todayStr && (day.status === 'Pending' || day.status === 'Waiting')) {
                     day.status = day.smoked <= day.target ? 'Pass' : 'Fail';
                     if (day.date === getYesterdayDateString() && day.status === 'Pass') {
                         showMotivation = true;
@@ -498,21 +470,39 @@
             renderTable();
         }
 
+        function startCountdown() {
+            if (countdownInterval) clearInterval(countdownInterval);
 
-        /**
-         * Resets the application to the initial setup screen.
-         */
-        function resetJourney() {
-            if (confirm(state.language === 'en' ? 'Are you sure you want to start over? All your progress will be lost.' : 'நீங்கள் மீண்டும் தொடங்க விரும்புகிறீர்களா? உங்கள் முன்னேற்றம் அனைத்தும் இழக்கப்படும்.')) {
-                localStorage.removeItem('smokeFreeState');
-                state = { language: state.language, plan: [], startDate: null, initialCount: 0, lastCheckedDate: null };
-                initialCigarettesInput.value = '';
-                showScreen('setup');
+            countdownInterval = setInterval(() => {
+                const now = new Date();
+                const midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 0);
+                const diff = midnight - now;
+
+                if (diff <= 0) {
+                    stopCountdown();
+                    location.reload();
+                    return;
+                }
+
+                const hours = String(Math.floor((diff / (1000 * 60 * 60)) % 24)).padStart(2, '0');
+                const minutes = String(Math.floor((diff / 1000 / 60) % 60)).padStart(2, '0');
+                const seconds = String(Math.floor((diff / 1000) % 60)).padStart(2, '0');
+                
+                const countdownSpan = document.getElementById('countdown-timer');
+                if (countdownSpan) {
+                    countdownSpan.textContent = `${hours}:${minutes}:${seconds}`;
+                }
+            }, 1000);
+        }
+        
+        function stopCountdown() {
+            if (countdownInterval) {
+                clearInterval(countdownInterval);
+                countdownInterval = null;
             }
         }
 
         // --- View & Modal Controls ---
-        
         function showScreen(screenName) {
             setupScreen.classList.add('hidden');
             mainScreen.classList.add('hidden');
@@ -521,15 +511,6 @@
             if(screenName === 'setup') setupScreen.classList.remove('hidden');
             if(screenName === 'main') mainScreen.classList.remove('hidden');
             if(screenName === 'congrats') congratsScreen.classList.remove('hidden');
-        }
-
-        function showMindfulnessModal() {
-            // Reset to phase 1
-            mindfulnessPhase1.classList.remove('hidden');
-            mindfulnessPhase2.classList.add('hidden');
-            mindfulnessPhase3.classList.add('hidden');
-            mindfulnessModal.classList.remove('hidden');
-            mindfulnessModal.querySelector('.modal-content').classList.add('scale-100');
         }
         
         function showMotivationModal() {
@@ -540,6 +521,22 @@
             motivationModal.querySelector('.modal-content').classList.add('scale-100');
         }
 
+        function showUrgeModal() {
+            const urgeTips = translations[state.language].urgeTips;
+            let randomIndex;
+            
+            do {
+                randomIndex = Math.floor(Math.random() * urgeTips.length);
+            } while (urgeTips.length > 1 && randomIndex === lastUrgeTipIndex);
+
+            lastUrgeTipIndex = randomIndex;
+            const randomTip = urgeTips[randomIndex];
+
+            urgeQuoteEl.textContent = randomTip;
+            urgeModal.classList.remove('hidden');
+            urgeModal.querySelector('.modal-content').classList.add('scale-100');
+        }
+
         function closeModal(modalId) {
             const modal = document.getElementById(modalId);
             modal.querySelector('.modal-content').classList.remove('scale-100');
@@ -547,7 +544,6 @@
         }
 
         // --- Local Storage ---
-        
         function saveState() {
             localStorage.setItem('smokeFreeState', JSON.stringify(state));
         }
@@ -560,10 +556,8 @@
         }
 
         // --- Date Helpers ---
-
         function getTodayEntry() {
-            const todayStr = getTodayDateString();
-            return state.plan.find(day => day.date === todayStr);
+            return state.plan.find(day => day.date === getTodayDateString());
         }
         
         function getTodayDateString() {
