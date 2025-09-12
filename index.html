@@ -128,7 +128,12 @@
         </div>
     </div>
     <div id="urge-modal" class="fixed inset-0 bg-black bg-opacity-75 backdrop-blur-sm flex items-center justify-center p-4 hidden modal-overlay">
-        <!-- ... urge modal content ... -->
+        <div class="bg-slate-800 rounded-2xl p-6 w-full max-w-sm mx-auto text-center modal-content transform scale-95 shadow-2xl border border-slate-700">
+             <div class="text-5xl mb-4">💪</div>
+            <h3 class="text-xl font-bold mb-4 text-cyan-400" data-translate="urgeTitle">Stay Strong!</h3>
+            <p id="urge-quote" class="text-slate-300 mb-6">A craving is just a thought. You are in control, not the thought.</p>
+            <button onclick="closeModal('urge-modal')" class="w-full bg-cyan-500 hover:bg-cyan-600 text-slate-900 font-bold py-2 px-4 rounded-lg" data-translate="urgeCloseButton">I Can Do This!</button>
+        </div>
     </div>
 
     <script>
@@ -150,6 +155,8 @@
         const genericModal = document.getElementById('generic-modal');
         const genericModalTitle = document.getElementById('generic-modal-title');
         const genericModalText = document.getElementById('generic-modal-text');
+        const urgeModal = document.getElementById('urge-modal');
+        const urgeQuoteEl = document.getElementById('urge-quote');
 
         // --- App State ---
         let state = {}; 
@@ -178,6 +185,18 @@
                 urgeButton: "Had an Urge?",
                 urgeTitle: "Stay Strong!",
                 urgeCloseButton: "I Can Do This!",
+                 urgeTips: [
+                    "Take a deep breath and a sip of cold water. Wait 5 minutes, the feeling will pass.",
+                    "Eat something you like! A healthy snack can distract you and satisfy cravings.",
+                    "Successful people are self-controlled. If you can control this, you can achieve anything.",
+                    "Think about why you started. Don't give up on that goal now.",
+                    "Go for a short walk. Changing your environment can break the craving cycle.",
+                    "Chew on some sugar-free gum or a healthy snack. The act of chewing can relieve stress.",
+                    "Listen to your favorite song. Music can instantly lift your mood and distract you from cravings.",
+                    "Text or call a friend or family member for support. A quick chat can make a big difference.",
+                    "Remind yourself of the money you're saving. Think about what you can buy with it.",
+                    "Play a quick game on your phone. Engaging your mind can help the craving pass."
+                ],
                 limitReachedText: "Next in <span id='countdown-timer' class='text-white'>--:--:--</span>",
                 statusPass: "Pass", statusFail: "Fail", statusPending: "Pending", statusWaiting: "Wait"
             },
@@ -201,6 +220,18 @@
                 urgeButton: "ஒரு ஆசையா?", 
                 urgeTitle: "திடமாக இருங்கள்!", 
                 urgeCloseButton: "என்னால் முடியும்!",
+                 urgeTips: [
+                    "ஆழ்ந்த மூச்சு விடுங்கள், குளிர் நீர் குடியுங்கள். 5 நிமிடங்கள் காத்திருங்கள், அந்த உணர்வு கடந்து போகும்.",
+                    "உங்களுக்குப் பிடித்த ஒன்றைச் சாப்பிடுங்கள்! ஒரு சிற்றுண்டி உங்கள் கவனத்தை திசை திருப்பும்.",
+                    "வெற்றியாளர்கள் தன்னடக்கம் கொண்டவர்கள். இதை உங்களால் கட்டுப்படுத்த முடிந்தால், எதையும் சாதிக்க முடியும்.",
+                    "ஏன் ஆரம்பித்தீர்கள் என்று சிந்தியுங்கள். அந்த இலக்கை இப்போது கைவிடாதீர்கள்.",
+                    "ஒரு சிறிய நடைப்பயிற்சி செல்லுங்கள். உங்கள் சூழலை மாற்றுவது ஆசையின் சுழற்சியை உடைக்கும்.",
+                    "சர்க்கரை இல்லாத பபுள் கம் அல்லது ஆரோக்கியமான சிற்றுண்டியை மெல்லுங்கள். மெல்லும் செயல் மன அழுத்தத்தைக் குறைக்கும்.",
+                    "உங்களுக்குப் பிடித்த பாடலைக் கேளுங்கள். இசை உங்கள் மனநிலையை உடனடியாக உயர்த்தி, ஆசைகளிலிருந்து திசை திருப்பும்.",
+                    "ஆதரவிற்காக ஒரு நண்பர் அல்லது குடும்ப உறுப்பினருக்கு மெசேஜ் அல்லது கால் செய்யுங்கள். ஒரு சிறிய உரையாடல் பெரிய மாற்றத்தை ஏற்படுத்தும்.",
+                    "நீங்கள் சேமிக்கும் பணத்தை நீங்களே நினைவுபடுத்திக் கொள்ளுங்கள். அதைக் கொண்டு என்ன வாங்கலாம் என்று சிந்தியுங்கள்.",
+                    "உங்கள் தொலைபேசியில் ஒரு விரைவான விளையாட்டை விளையாடுங்கள். உங்கள் மனதை ஈடுபடுத்துவது ஆசை கடந்து செல்ல உதவும்."
+                ],
                 limitReachedText: "அடுத்து <span id='countdown-timer' class='text-white'>--:--:--</span>",
                 statusPass: "வெற்றி", 
                 statusFail: "தோல்வி", 
@@ -421,7 +452,24 @@
             modal.classList.add('hidden');
         }
 
-        function showUrgeModal() { /* ... */ }
+        function showUrgeModal() {
+            const urgeTips = translations[state.language]?.urgeTips;
+            if (!urgeTips || urgeTips.length === 0) return;
+
+            let randomIndex;
+            do {
+                randomIndex = Math.floor(Math.random() * urgeTips.length);
+            } while (urgeTips.length > 1 && randomIndex === lastUrgeTipIndex);
+
+            lastUrgeTipIndex = randomIndex;
+            const randomTip = urgeTips[randomIndex];
+            
+            if (urgeQuoteEl && urgeModal) {
+                urgeQuoteEl.textContent = randomTip;
+                urgeModal.classList.remove('hidden');
+                urgeModal.querySelector('.modal-content').classList.add('scale-100');
+            }
+        }
 
         function saveState() {
             localStorage.setItem('smokeFreeJourneyState', JSON.stringify(state));
