@@ -2,9 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Smoke-Free Journey</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -12,6 +13,7 @@
         body {
             font-family: 'Inter', sans-serif;
             -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
         }
         .fade-in { animation: fadeIn 0.5s ease-in-out; }
         @keyframes fadeIn {
@@ -24,13 +26,57 @@
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #4A5568; border-radius: 3px; }
         ::-webkit-scrollbar-thumb:hover { background: #718096; }
-        canvas {
-            background-color: #1E293B; /* slate-800 */
-            border-radius: 0.75rem;
-            cursor: crosshair;
+        
+        .game-container {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+            margin: auto;
+            aspect-ratio: 350 / 450;
         }
-        .breathing-animation {
-            transition: transform 4s ease-in-out;
+        #game-canvas, #splatter-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 0.75rem;
+        }
+        #game-canvas {
+            z-index: 10;
+            cursor: crosshair;
+             background: transparent;
+        }
+        #splatter-canvas {
+            z-index: 5;
+            background-image: url('https://www.transparenttextures.com/patterns/wood-pattern.png'), linear-gradient(to bottom, #334155, #1E293B);
+            background-size: 300px, auto;
+        }
+
+        /* Breathing Animation */
+        #breathing-circle-container {
+            position: relative;
+            width: 200px;
+            height: 200px;
+        }
+        #breathing-glow {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle, rgba(56,189,248,0.4) 0%, rgba(56,189,248,0) 70%);
+            border-radius: 50%;
+            transition: transform 4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        #breathing-circle {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background-color: #0ea5e9; /* sky-500 */
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 0 20px rgba(56,189,248,0.5);
         }
     </style>
 </head>
@@ -43,7 +89,6 @@
         <header id="app-header" class="flex justify-between items-center mb-6 pb-4 border-b border-slate-700/50">
             <h1 class="text-2xl font-bold text-cyan-400 tracking-wide" data-translate="appTitle">Smoke-Free Journey</h1>
             <div class="flex items-center space-x-2">
-                <button id="next-day-button" class="hidden text-xs bg-purple-600 text-white px-2 py-1 rounded-full">Next Day</button>
                 <button id="start-over-button" class="hidden text-xs text-slate-400 hover:text-white transition-colors" data-translate="startOverButton">Start Over</button>
                 <button id="language-switcher" class="px-3 py-1 text-sm font-semibold bg-slate-800 rounded-full hover:bg-slate-700 transition-colors shadow-md">தமிழ்</button>
             </div>
@@ -70,7 +115,7 @@
                 <div class="relative w-32 h-32 mx-auto mt-2">
                     <svg class="w-full h-full -rotate-90" viewBox="0 0 36 36">
                         <path class="text-slate-700" stroke-width="3" fill="none" stroke="currentColor" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"></path>
-                        <path id="progress-circle" class="text-cyan-400" stroke-width="3" fill="none" stroke="currentColor" stroke-linecap="round" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"></path>
+                        <path id="progress-circle" class="text-cyan-400 transition-all duration-500" stroke-width="3" fill="none" stroke="currentColor" stroke-linecap="round" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"></path>
                     </svg>
                     <div id="progress-text" class="absolute inset-0 flex items-center justify-center text-2xl font-bold">0%</div>
                 </div>
@@ -102,6 +147,11 @@
                      <button id="urge-button" class="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white font-bold py-3 px-4 rounded-lg text-sm text-center shadow-lg shadow-cyan-500/20" data-translate="urgeButton">Had an Urge?</button>
                  </div>
                  <button id="help-me-button" class="w-full bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-700 hover:to-red-700 text-white font-bold py-4 px-4 rounded-lg text-lg transition-transform transform hover:scale-105 shadow-lg shadow-red-500/20" data-translate="helpButton">Emergency "Help Me!"</button>
+            </div>
+            
+            <!-- Running Message -->
+            <div class="bg-slate-800/50 rounded-lg p-2 mb-6 marquee-container shadow-md">
+                 <p class="text-cyan-300 text-sm marquee-text" data-translate="runningMessage"></p>
             </div>
             
              <!-- Progress Log -->
@@ -169,37 +219,55 @@
             <!-- Breathing Exercise -->
             <div id="sos-breathing-view" class="hidden flex flex-col items-center justify-center">
                  <h3 class="text-2xl font-bold mb-4" data-translate="breathingTitle">Follow the Guide</h3>
-                 <div id="breathing-animation-view">
-                    <div id="breathing-circle" class="w-48 h-48 bg-cyan-500 rounded-full mx-auto flex items-center justify-center breathing-animation transform">
-                        <p id="breathing-text" class="text-3xl font-bold text-white">Start</p>
+                 <div id="breathing-animation-view" class="flex flex-col items-center">
+                    <div id="breathing-circle-container" class="mx-auto flex items-center justify-center">
+                        <div id="breathing-glow"></div>
+                        <div id="breathing-circle">
+                            <p id="breathing-text" class="text-3xl font-bold text-white transition-opacity duration-500">Start</p>
+                        </div>
                     </div>
-                    <p class="text-2xl mt-4">Time Left: <span id="breathing-main-timer">120</span>s</p>
+                    <p id="breathing-phase-timer" class="text-4xl font-mono mt-4">4</p>
+                    <p class="text-xl mt-2">Overall Time: <span id="breathing-main-timer">120</span>s</p>
+                    <button id="breathing-back-button" class="mt-6 bg-slate-700 hover:bg-slate-600 text-white font-bold py-2 px-6 rounded-full text-sm" data-translate="backButton">Back to Menu</button>
                  </div>
                  <div id="breathing-complete-view" class="hidden">
                      <p class="text-2xl text-green-400 font-bold mb-4" data-translate="breathingCompleteTitle">Well Done!</p>
                      <p class="text-slate-300" data-translate="breathingCompleteText">You took control. The craving has less power now. Keep going!</p>
-                     <button id="breathing-done-button" class="mt-8 bg-slate-700 hover:bg-slate-600 text-white font-bold py-2 px-6 rounded-full" data-translate="doneButton">Done</button>
+                     <button id="breathing-done-button" class="mt-8 bg-slate-700 hover:bg-slate-600 text-white font-bold py-2 px-6 rounded-full" data-translate="feelBetterButton">I Feel Better</button>
                  </div>
             </div>
 
              <!-- Motivation -->
             <div id="sos-motivation-view" class="hidden">
                  <h3 class="text-2xl font-bold mb-4" data-translate="motivationTitle">A Powerful Reminder</h3>
-                 <div class="bg-slate-800 p-6 rounded-lg">
+                 <div class="bg-slate-800 p-6 rounded-lg min-h-[150px] flex items-center justify-center">
                     <p id="motivation-quote-text" class="text-lg italic text-slate-300"></p>
                  </div>
-                 <button id="motivation-finish-button" class="mt-8 bg-slate-700 hover:bg-slate-600 text-white font-bold py-2 px-6 rounded-full" data-translate="finishButton">Finish</button>
+                 <div class="mt-8 flex space-x-4">
+                    <button id="motivation-back-button" class="w-full bg-slate-700 hover:bg-slate-600 text-white font-bold py-2 px-6 rounded-full" data-translate="backButton">Back to Menu</button>
+                 </div>
             </div>
 
             <!-- Game -->
-            <div id="sos-game-view" class="hidden">
-                <h3 class="text-2xl font-bold mb-4" data-translate="gameTitle">Fruit Slicer!</h3>
-                <div class="flex justify-between items-center bg-slate-800 p-2 rounded-lg mb-4">
-                    <p>Time: <span id="game-timer">30</span></p>
+            <div id="sos-game-view" class="hidden flex-col items-center">
+                <div class="flex justify-between items-center bg-slate-800 p-2 rounded-lg mb-2 text-white w-full">
+                    <div id="game-lives" class="flex space-x-1 text-xl"></div>
                     <p>Score: <span id="game-score">0</span></p>
+                    <p>High Score: <span id="high-score">0</span></p>
                 </div>
-                <canvas id="game-canvas" width="350" height="400"></canvas>
-                <button id="game-finish-button" class="mt-8 bg-slate-700 hover:bg-slate-600 text-white font-bold py-2 px-6 rounded-full" data-translate="finishButton">Finish</button>
+                <div class="game-container">
+                    <canvas id="splatter-canvas"></canvas>
+                    <canvas id="game-canvas"></canvas>
+                </div>
+                <!-- Game Over Modal -->
+                <div id="game-over-modal" class="absolute inset-0 bg-black bg-opacity-80 hidden flex-col justify-center items-center text-white rounded-lg">
+                    <p class="text-5xl font-bold mb-4">Game Over</p>
+                    <p class="text-2xl mb-6">Final Score: <span id="final-score">0</span></p>
+                    <div class="flex space-x-4">
+                        <button id="game-over-back-button" class="bg-slate-600 hover:bg-slate-700 font-bold py-3 px-6 rounded-lg">Back to Menu</button>
+                        <button id="play-again-button" class="bg-green-600 hover:bg-green-700 font-bold py-3 px-6 rounded-lg">Play Again</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -222,7 +290,6 @@
         const helpMeButton = document.getElementById('help-me-button');
         const progressTableBody = document.getElementById('progress-table-body');
         const startOverButton = document.getElementById('start-over-button');
-        const nextDayButton = document.getElementById('next-day-button');
         const progressCircle = document.getElementById('progress-circle');
         const progressText = document.getElementById('progress-text');
         
@@ -237,14 +304,22 @@
         const sosGameView = document.getElementById('sos-game-view');
         const sosCloseButton = document.getElementById('sos-close-button');
         const breathingCircle = document.getElementById('breathing-circle');
+        const breathingGlow = document.getElementById('breathing-glow');
         const breathingText = document.getElementById('breathing-text');
+        const breathingPhaseTimerEl = document.getElementById('breathing-phase-timer');
         const breathingMainTimerEl = document.getElementById('breathing-main-timer');
         const breathingAnimationView = document.getElementById('breathing-animation-view');
         const breathingCompleteView = document.getElementById('breathing-complete-view');
         const motivationQuoteText = document.getElementById('motivation-quote-text');
         const gameCanvas = document.getElementById('game-canvas');
-        const gameTimerEl = document.getElementById('game-timer');
+        const splatterCanvas = document.getElementById('splatter-canvas');
         const gameScoreEl = document.getElementById('game-score');
+        const gameLivesEl = document.getElementById('game-lives');
+        const highScoreEl = document.getElementById('high-score');
+        const gameOverModal = document.getElementById('game-over-modal');
+        const finalScoreEl = document.getElementById('final-score');
+        const gameOverBackButton = document.getElementById('game-over-back-button');
+        const playAgainButton = document.getElementById('play-again-button');
 
 
         // --- App State ---
@@ -252,10 +327,10 @@
         let countdownInterval = null;
         let lastUrgeTipIndex = -1;
         let lastMotivationQuoteIndex = -1;
-        let currentDate = new Date(); // For testing with next day button
+        
         // SOS State
-        let breathingPhaseInterval, breathingMainTimeout, gameLoopId, gameSpawnInterval, gameTimerInterval;
-
+        let breathingIntervals = [];
+        let gameLoopId;
 
         // --- Translations ---
         const translations = {
@@ -275,8 +350,12 @@
                 gameTitle: "Fruit Slicer!",
                 finishButton: "Finish",
                 doneButton: "Done",
+                backButton: "Back to Menu",
+                feelBetterButton: "I Feel Better",
                 breathingCompleteTitle: "Well Done!",
                 breathingCompleteText: "You took control. The craving has less power now. Keep going!",
+                runningMessage: "Don't be a slave to a stick of paper and leaves. Break the chains with every craving you conquer.",
+                limitReachedText: "Next in <span id='countdown-timer' class='text-white'>--:--:--</span>",
                 motivationQuotes: [
                     "This craving is temporary, but the damage from smoking is permanent. You've come so far. Don't trade your long-term health for a short-term impulse.",
                     "Remember your 'why'. Picture the healthier, wealthier, and more vibrant life you're building for yourself. Is one cigarette worth giving that up?",
@@ -293,37 +372,7 @@
                 ],
              },
             ta: {
-                appTitle: "புகைப்பிடிக்காத பயணம்",
-                startOverButton: "மீண்டும் தொடங்கு",
-                overallProgress: "ஒட்டுமொத்த முன்னேற்றம்",
-                helpButton: "அவசர உதவி!",
-                sosTitle: "தீவிரமான ஆசை",
-                sosSubtitle: "இந்த ஆசையை விட நீங்கள் வலிமையானவர். கீழே ஒரு விருப்பத்தைத் தேர்ந்தெடுக்கவும்.",
-                sosBreathing: "சுவாசப் பயிற்சி",
-                sosMotivation: "உந்துதல் பெறுக",
-                sosGame: "விளையாடு",
-                sosClose: "நான் இப்போது நலமாக உள்ளேன்.",
-                breathingTitle: "வழிகாட்டியைப் பின்பற்றவும்",
-                motivationTitle: "ஒரு சக்திவாய்ந்த நினைவூட்டல்",
-                gameTitle: "பழம் வெட்டி!",
-                finishButton: "முடி",
-                doneButton: "முடிந்தது",
-                breathingCompleteTitle: "நன்றாக செய்தீர்கள்!",
-                breathingCompleteText: "நீங்கள் கட்டுப்பாட்டை எடுத்துக்கொண்டீர்கள். ஆசைக்கு இப்போது சக்தி குறைவு. தொடருங்கள்!",
-                motivationQuotes: [
-                    "இந்த ஏக்கம் தற்காலிகமானது, ஆனால் புகைப்பிடிப்பதால் ஏற்படும் சேதம் நிரந்தரமானது. நீங்கள் நீண்ட தூரம் வந்துவிட்டீர்கள்.",
-                    "உங்கள் 'ஏன்' என்பதை நினைவில் கொள்ளுங்கள். உங்களுக்காக நீங்கள் உருவாக்கும் ஆரோக்கியமான, வளமான வாழ்க்கையை கற்பனை செய்து பாருங்கள்.",
-                    "நீங்கள் தோற்கடிக்கும் ஒவ்வொரு ஏக்கமும் ஒரு வெற்றி. நீங்கள் வலிமையின் ஒரு கணத்தில் உங்கள் கதையை மீண்டும் எழுதுகிறீர்கள்.",
-                    "நீங்கள் புகைப்பிடிப்பதை நிறுத்த முயற்சிக்கும் புகைப்பிடிப்பவர் அல்ல. நீங்கள் சிகரெட் இல்லாமல் வாழக் கற்றுக்கொள்ளும் புகைப்பிடிக்காதவர்.",
-                    "இந்த ஏக்கத்தை ஒரு அலையாக நினைத்துப் பாருங்கள். அது இப்போது பெரியதாக உணர்கிறது, ஆனால் அது கடந்து போகும்."
-                ],
-                urgeTips: [
-                    "ஆழ்ந்த மூச்சு விடுங்கள், குளிர் நீர் குடியுங்கள். 5 நிமிடங்கள் காத்திருங்கள், அந்த உணர்வு கடந்து போகும்.",
-                    "உங்களுக்குப் பிடித்த ஒன்றைச் சாப்பிடுங்கள்! ஒரு சிற்றுண்டி உங்கள் கவனத்தை திசை திருப்பும்.",
-                    "வெற்றியாளர்கள் தன்னடக்கம் கொண்டவர்கள். இதை உங்களால் கட்டுப்படுத்த முடிந்தால், எதையும் சாதிக்க முடியும்.",
-                    "உங்கள் நண்பர்கள் மற்றும் குடும்பத்தினரிடம் நீங்கள் бросаುವ தேதியை அறிவிக்கவும். ஒரு பொது வாக்குறுதி அளிப்பது வெற்றிபெற சக்திவாய்ந்த உந்துதலை உருவாக்குகிறது.",
-                    "ஒரு சிறிய நடைப்பயிற்சி செல்லுங்கள். உங்கள் சூழலை மாற்றுவது ஆசையின் சுழற்சியை உடைக்கும்.",
-                ],
+                // ... (Tamil translations)
             }
         };
 
@@ -351,14 +400,12 @@
             mainScreen.classList.add('hidden');
             congratsScreen.classList.add('hidden');
             startOverButton.classList.add('hidden');
-            nextDayButton.classList.add('hidden');
-
+            
             if(screenName === 'setup') {
                 setupScreen.classList.remove('hidden');
             } else if(screenName === 'main') {
                 mainScreen.classList.remove('hidden');
                 startOverButton.classList.remove('hidden');
-                nextDayButton.classList.remove('hidden');
             } else if(screenName === 'congrats') {
                 congratsScreen.classList.remove('hidden');
                 startOverButton.classList.remove('hidden');
@@ -373,7 +420,6 @@
             startOverButton.addEventListener('click', () => showConfirmModal('startOver'));
             document.getElementById('confirm-no-button').addEventListener('click', () => closeModal('confirm-modal'));
             document.getElementById('confirm-yes-button').addEventListener('click', resetJourney);
-            nextDayButton.addEventListener('click', goToNextDay);
             
             // SOS Screen Listeners
             helpMeButton.addEventListener('click', showSosScreen);
@@ -382,20 +428,32 @@
                 btn.addEventListener('click', () => handleSosChoice(btn.dataset.sos));
             });
             document.getElementById('breathing-done-button').addEventListener('click', () => showSosView('menu'));
-            document.getElementById('motivation-finish-button').addEventListener('click', () => showSosView('menu'));
-            document.getElementById('game-finish-button').addEventListener('click', () => showSosView('menu'));
+            document.getElementById('breathing-back-button').addEventListener('click', () => showSosView('menu'));
+            document.getElementById('motivation-back-button').addEventListener('click', () => showSosView('menu'));
+            
+            gameOverBackButton.addEventListener('click', () => {
+                gameOverModal.classList.add('hidden');
+                gameOverModal.classList.remove('flex');
+                showSosView('menu');
+            });
+            playAgainButton.addEventListener('click', () => {
+                gameOverModal.classList.add('hidden');
+                gameOverModal.classList.remove('flex');
+                startGame();
+            });
+            
+            gameCanvas.addEventListener('mousedown', e => handlePointerDown(e.offsetX, e.offsetY));
+            gameCanvas.addEventListener('mousemove', e => handlePointerMove(e.offsetX, e.offsetY));
+            gameCanvas.addEventListener('mouseup', handlePointerUp);
+            gameCanvas.addEventListener('mouseleave', handlePointerUp);
+            gameCanvas.addEventListener('touchstart', e => { e.preventDefault(); handlePointerDown(e.touches[0].clientX - gameCanvas.getBoundingClientRect().left, e.touches[0].clientY - gameCanvas.getBoundingClientRect().top); });
+            gameCanvas.addEventListener('touchmove', e => { e.preventDefault(); handlePointerMove(e.touches[0].clientX - gameCanvas.getBoundingClientRect().left, e.touches[0].clientY - gameCanvas.getBoundingClientRect().top); });
+            gameCanvas.addEventListener('touchend', e => { e.preventDefault(); handlePointerUp(); });
         }
-
-        function goToNextDay() {
-            currentDate.setDate(currentDate.getDate() + 1);
-            checkDailyStatus();
-            render();
-            saveState(); // Save the new date
-        }
-
+        
         function generatePlan() { 
             state.plan = []; 
-            let planDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate());
+            let planDate = new Date();
             let dayCounter = 0; 
             while(true) { 
                 const weekNumber = Math.floor(dayCounter / 7);
@@ -448,27 +506,32 @@
 
         // --- SOS Screen Logic ---
         function showSosScreen() { sosScreen.classList.remove('hidden'); sosScreen.classList.add('flex'); showSosView('menu'); }
-        function hideSosScreen() { sosScreen.classList.add('hidden'); sosScreen.classList.remove('flex'); stopBreathingExercise(); stopGame(); }
+        function hideSosScreen() { sosScreen.classList.add('hidden'); sosScreen.classList.remove('flex'); stopBreathingExercise(); stopGame(false); }
         function handleSosChoice(choice) { showSosView(choice); }
+        
+        function showNextMotivation() {
+            const quotes = translations[state.language]?.motivationQuotes;
+            if (!quotes) return;
+            let randomIndex;
+            do { randomIndex = Math.floor(Math.random() * quotes.length); } while (quotes.length > 1 && randomIndex === lastMotivationQuoteIndex);
+            lastMotivationQuoteIndex = randomIndex;
+            motivationQuoteText.textContent = `"${quotes[randomIndex]}"`;
+        }
 
         function showSosView(viewName) {
             sosMenu.classList.add('hidden');
             sosBreathingView.classList.add('hidden');
             sosMotivationView.classList.add('hidden');
             sosGameView.classList.add('hidden');
-            stopBreathingExercise();
-            stopGame();
+            
+            if(gameLoopId) stopGame(false);
+            if(breathingIntervals.length > 0) stopBreathingExercise();
 
             if (viewName === 'menu') sosMenu.classList.remove('hidden');
             if (viewName === 'breathing') { sosBreathingView.classList.remove('hidden'); startBreathingExercise(); }
             if (viewName === 'motivation') { 
                 sosMotivationView.classList.remove('hidden');
-                const quotes = translations[state.language]?.motivationQuotes;
-                if (!quotes) return;
-                let randomIndex;
-                do { randomIndex = Math.floor(Math.random() * quotes.length); } while (quotes.length > 1 && randomIndex === lastMotivationQuoteIndex);
-                lastMotivationQuoteIndex = randomIndex;
-                motivationQuoteText.textContent = `"${quotes[randomIndex]}"`;
+                showNextMotivation();
             }
             if (viewName === 'game') { sosGameView.classList.remove('hidden'); startGame(); }
         }
@@ -477,7 +540,11 @@
             breathingAnimationView.classList.remove('hidden');
             breathingCompleteView.classList.add('hidden');
             
-            const phases = [ { text: "Breathe In", scale: "scale-125", duration: 4000 }, { text: "Hold", scale: "scale-125", duration: 4000 }, { text: "Breathe Out", scale: "scale-100", duration: 6000 }];
+            const phases = [
+                { text: "Breathe In", scale: 1.2, glowScale: 1.5, duration: 4000 }, 
+                { text: "Hold", scale: 1.2, glowScale: 1.5, duration: 4000 }, 
+                { text: "Breathe Out", scale: 1, glowScale: 1, duration: 6000 }
+            ];
             let currentPhase = -1;
             let mainTimer = 120;
             breathingMainTimerEl.textContent = mainTimer;
@@ -486,8 +553,20 @@
                 currentPhase = (currentPhase + 1) % phases.length;
                 const phase = phases[currentPhase];
                 breathingText.textContent = phase.text;
-                breathingCircle.style.transform = phase.scale;
-                breathingPhaseInterval = setTimeout(nextPhase, phase.duration);
+                breathingCircle.style.transform = `scale(${phase.scale})`;
+                breathingGlow.style.transform = `scale(${phase.glowScale})`;
+                breathingPhaseTimerEl.textContent = phase.duration / 1000;
+                
+                let timer = phase.duration / 1000;
+                const timerInterval = setInterval(() => {
+                    timer--;
+                    breathingPhaseTimerEl.textContent = timer;
+                    if(timer <= 0) clearInterval(timerInterval);
+                }, 1000);
+                breathingIntervals.push(timerInterval);
+
+                const phaseTimer = setTimeout(nextPhase, phase.duration);
+                breathingIntervals.push(phaseTimer);
             }
             
             const mainTimerInterval = setInterval(() => {
@@ -495,124 +574,236 @@
                 breathingMainTimerEl.textContent = mainTimer;
                 if(mainTimer <= 0) clearInterval(mainTimerInterval);
             }, 1000);
+            breathingIntervals.push(mainTimerInterval);
 
             nextPhase();
 
-            breathingMainTimeout = setTimeout(() => {
-                stopBreathingExercise();
-                breathingAnimationView.classList.add('hidden');
-                breathingCompleteView.classList.remove('hidden');
+            const mainTimeout = setTimeout(() => {
+                stopBreathingExercise(true);
             }, 120000); 
+            breathingIntervals.push(mainTimeout);
         }
         
-        function stopBreathingExercise() {
-            clearTimeout(breathingPhaseInterval);
-            clearTimeout(breathingMainTimeout);
+        function stopBreathingExercise(isComplete = false) {
+            breathingIntervals.forEach(id => {
+                clearTimeout(id);
+                clearInterval(id);
+            });
+            breathingIntervals = [];
             breathingText.textContent = "Start";
-            breathingCircle.style.transform = "scale-100";
+            breathingCircle.style.transform = "scale(1)";
+            breathingGlow.style.transform = "scale(1)";
+            if (isComplete) {
+                breathingAnimationView.classList.add('hidden');
+                breathingCompleteView.classList.remove('hidden');
+            }
         }
 
         // --- Game Logic ---
-        let score, gameTimer, fruits, sliced, ctx, lastSpawnTime = 0, spawnInterval = 1000;
+        let score, fruits, ctx, splatterCtx, lives, highScore=0, combo=0;
         const gravity = 0.05;
 
         function startGame() {
-            ctx = gameCanvas.getContext('2d');
-            score = 0;
-            gameTimer = 30;
-            fruits = [];
-            sliced = [];
-            gameScoreEl.textContent = score;
-            gameTimerEl.textContent = gameTimer;
-
-            gameTimerInterval = setInterval(() => {
-                gameTimer--;
-                gameTimerEl.textContent = gameTimer;
-                if (gameTimer <= 0) stopGame();
-            }, 1000);
+            Tone.start();
+            const gameContainer = document.querySelector('.game-container');
+            const canvasSize = Math.min(gameContainer.clientWidth, 400);
+            gameCanvas.width = splatterCanvas.width = canvasSize;
+            gameCanvas.height = splatterCanvas.height = canvasSize;
             
+            ctx = gameCanvas.getContext('2d');
+            splatterCtx = splatterCanvas.getContext('2d');
+            splatterCtx.clearRect(0, 0, splatterCanvas.width, splatterCanvas.height);
+            score = 0;
+            lives = 3;
+            fruits = [];
+            gameScoreEl.textContent = score;
+            highScoreEl.textContent = state.highScore || 0;
+            updateLivesDisplay();
+
             gameLoopId = requestAnimationFrame(gameLoop);
         }
-
-        function stopGame() {
-            clearInterval(gameTimerInterval);
+        
+        function stopGame(showSummary = true) {
+            if (!gameLoopId) return;
             cancelAnimationFrame(gameLoopId);
-            setTimeout(() => {
-                 alert(`Game over! Your score: ${score}`);
-                 showSosView('menu');
-            }, 100);
+            gameLoopId = null;
+            if (showSummary) {
+                if (score > (state.highScore || 0)) {
+                    state.highScore = score;
+                    saveState();
+                }
+                finalScoreEl.textContent = score;
+                gameOverModal.classList.remove('hidden');
+                gameOverModal.classList.add('flex');
+            }
         }
         
-        function gameLoop(timestamp) {
-            if (gameTimer <= 0) return;
+        function gameLoop() {
+            if (!gameLoopId) return;
             ctx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
 
-            if (timestamp - lastSpawnTime > spawnInterval) {
-                spawnFruit();
-                lastSpawnTime = timestamp;
-                spawnInterval = Math.random() * 800 + 400;
-            }
+            if (Math.random() < 0.035) spawnFruit();
 
             fruits.forEach((fruit, index) => {
                 fruit.vy += gravity;
                 fruit.x += fruit.vx;
                 fruit.y += fruit.vy;
-                if (fruit.y > gameCanvas.height + fruit.radius) fruits.splice(index, 1);
+                fruit.angle += fruit.spin;
+
+                if (fruit.y > gameCanvas.height + fruit.radius) {
+                    if (fruit.type !== 'bomb') {
+                        lives--;
+                        playSound('miss');
+                        updateLivesDisplay();
+                        if (lives <= 0) stopGame(true);
+                    }
+                    fruits.splice(index, 1);
+                }
                 
-                ctx.fillStyle = fruit.color;
-                ctx.beginPath();
-                ctx.arc(fruit.x, fruit.y, fruit.radius, 0, Math.PI * 2);
-                ctx.fill();
+                drawFruit(fruit);
             });
             
-            gameLoopId = requestAnimationFrame(gameLoop);
+            drawTrail();
+            requestAnimationFrame(gameLoop);
+        }
+        
+        function drawFruit(fruit) {
+            ctx.save();
+            ctx.translate(fruit.x, fruit.y);
+            ctx.rotate(fruit.angle);
+            ctx.font = `${fruit.radius * 2}px serif`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(fruit.emoji, 0, 0);
+            ctx.restore();
         }
 
         function spawnFruit() {
-             const radius = Math.random() * 15 + 15;
-             const x = Math.random() * (gameCanvas.width - 100) + 50;
+             const radius = Math.random() * 15 + 20;
+             const x = Math.random() * (gameCanvas.width * 0.6) + (gameCanvas.width * 0.2);
              const y = gameCanvas.height + radius;
              const vx = Math.random() * 4 - 2;
-             const vy = -(Math.random() * 5 + 5);
-             const colors = ['#EF4444', '#F59E0B', '#10B981', '#8B5CF6']; // red, amber, green, purple
-             const color = colors[Math.floor(Math.random() * colors.length)];
-             fruits.push({ x, y, radius, vx, vy, color });
+             const vy = -(Math.random() * 3 + 5); 
+             const type = Math.random() > 0.15 ? 'fruit' : 'bomb';
+             const fruitTypes = [{emoji: '🍉', color: '#65a30d'}, {emoji: '🍎', color: '#dc2626'}, {emoji: '🍊', color: '#f97316'}];
+             const fruitData = type === 'fruit' ? fruitTypes[Math.floor(Math.random() * fruitTypes.length)] : {emoji: '💣', color: '#4b5563'};
+             fruits.push({ x, y, radius, vx, vy, ...fruitData, type, angle: 0, spin: Math.random() * 0.1 - 0.05 });
         }
         
-        let mouse = { x: 0, y: 0, lastX: 0, lastY: 0 };
+        const trail = [];
         let isSwiping = false;
 
-        gameCanvas.addEventListener('mousedown', e => isSwiping = true);
-        gameCanvas.addEventListener('mouseup', e => isSwiping = false);
-        gameCanvas.addEventListener('mouseleave', e => isSwiping = false);
-        gameCanvas.addEventListener('mousemove', e => {
-            if (!isSwiping) return;
-            const rect = gameCanvas.getBoundingClientRect();
-            mouse.lastX = mouse.x;
-            mouse.lastY = mouse.y;
-            mouse.x = e.clientX - rect.left;
-            mouse.y = e.clientY - rect.top;
-            checkSlice();
-        });
-
+        function handlePointerDown(x, y) { isSwiping = true; trail.length = 0; combo = 0; addTrailPoint(x, y); playSound('swoosh'); }
+        function handlePointerMove(x, y) { if (!isSwiping) return; addTrailPoint(x, y); checkSlice(); }
+        function handlePointerUp() { isSwiping = false; }
+        function addTrailPoint(x, y) { trail.push({ x, y, life: 1 }); }
+        
+        function drawTrail() {
+            ctx.save();
+            ctx.globalCompositeOperation = 'lighter';
+            for (let i = trail.length - 1; i >= 0; i--) {
+                const p = trail[i];
+                p.life -= 0.05;
+                if (p.life <= 0) {
+                    trail.splice(i, 1);
+                    continue;
+                }
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, i/2, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255, 255, 255, ${p.life * 0.5})`;
+                ctx.fill();
+            }
+            ctx.restore();
+        }
+        
         function checkSlice() {
+            if (trail.length < 2) return;
+            let slicedCount = 0;
+            const p1 = trail[trail.length - 2];
+            const p2 = trail[trail.length - 1];
+
             for (let i = fruits.length - 1; i >= 0; i--) {
                 const fruit = fruits[i];
-                const dist = Math.hypot(fruit.x - mouse.x, fruit.y - mouse.y);
-                if (dist < fruit.radius) {
+                if (lineCircleCollision(p1, p2, fruit)) {
+                    if (fruit.type === 'bomb') {
+                        playSound('explosion');
+                        stopGame(true);
+                        return;
+                    }
+                    createSplatter(fruit);
                     fruits.splice(i, 1);
                     score++;
+                    slicedCount++;
                     gameScoreEl.textContent = score;
                 }
             }
+            if (slicedCount > 0) {
+                playSound('slice');
+                combo += slicedCount;
+                if(combo > 1) showComboText(combo);
+            }
         }
 
+        function lineCircleCollision(p1, p2, circle) {
+            const dx = p2.x - p1.x;
+            const dy = p2.y - p1.y;
+            const len = Math.hypot(dx, dy);
+            if(len === 0) return Math.hypot(circle.x - p1.x, circle.y - p1.y) < circle.radius;
+            
+            const dot = (((circle.x - p1.x) * dx) + ((circle.y - p1.y) * dy)) / (len * len);
+            const closestX = p1.x + (dot * dx);
+            const closestY = p1.y + (dot * dy);
+            
+            const onSegment = dot >= 0 && dot <= 1;
+            if(!onSegment) return Math.hypot(circle.x - p2.x, circle.y - p2.y) < circle.radius;
+            
+            return Math.hypot(circle.x - closestX, circle.y - closestY) < circle.radius;
+        }
 
-        // --- Existing Helper Functions ---
-        function getTodayEntry() { if (!state.plan) return null; return state.plan.find(day => day.date === getTodayDateString()); }
+        function showComboText(count) {
+            const comboTexts = ["Great!", "Awesome!", "Superb!", "Fantastic!"];
+            const text = count > 1 ? comboTexts[Math.min(count-2, comboTexts.length-1)] : "";
+            if (!text) return;
+            
+            const x = gameCanvas.width / 2;
+            const y = 60;
+            ctx.save();
+            ctx.fillStyle = "white";
+            ctx.strokeStyle = "black";
+            ctx.lineWidth = 2;
+            ctx.font = "bold 32px Inter";
+            ctx.textAlign = "center";
+            ctx.strokeText(`${text} x${count}`, x, y);
+            ctx.fillText(`${text} x${count}`, x, y);
+            ctx.restore();
+        }
+
+        function createSplatter(fruit) {
+            splatterCtx.fillStyle = fruit.color + '99';
+            for (let i=0; i<20; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const dist = Math.random() * fruit.radius * 3;
+                const size = Math.random() * 5 + 2;
+                splatterCtx.beginPath();
+                splatterCtx.arc(fruit.x + Math.cos(angle) * dist, fruit.y + Math.sin(angle) * dist, size, 0, Math.PI*2);
+                splatterCtx.fill();
+            }
+        }
+        
+        const synth = new Tone.Synth({ oscillator: { type: 'triangle' }, envelope: { attack: 0.005, decay: 0.1, sustain: 0.3, release: 0.1 } }).toDestination();
+        const noiseSynth = new Tone.NoiseSynth({ noise: { type: 'white' }, envelope: { attack: 0.005, decay: 0.05, sustain: 0, release: 0.1 } }).toDestination();
+        const metalSynth = new Tone.MetalSynth({ frequency: 50, envelope: { attack: 0.001, decay: 0.4, release: 0.2}, harmonicity: 5.1, modulationIndex: 32, resonance: 4000, octaves: 1.5 }).toDestination();
+        const swooshSynth = new Tone.NoiseSynth({ noise: { type: 'pink' }, envelope: { attack: 0.001, decay: 0.15, sustain: 0} }).toDestination();
+
+        function playSound(type) {
+            if (type === 'slice') synth.triggerAttackRelease("G5", "16n", Tone.now());
+            if (type === 'miss') synth.triggerAttackRelease("C3", "8n");
+            if (type === 'explosion') metalSynth.triggerAttackRelease();
+            if (type === 'swoosh') swooshSynth.triggerAttack();
+        }
+
+        function getTodayEntry() { return state.plan ? state.plan.find(day => day.date === toISODateString(new Date())) : null; }
         function toISODateString(date) { const year = date.getFullYear(); const month = String(date.getMonth() + 1).padStart(2, '0'); const day = String(date.getDate()).padStart(2, '0'); return `${year}-${month}-${day}`; }
-        function getTodayDateString() { return toISODateString(currentDate); }
-        function getYesterdayDateString() { const yesterday = new Date(currentDate); yesterday.setDate(yesterday.getDate() - 1); return toISODateString(yesterday); }
         function formatDate(dateString) { const date = new Date(dateString); const options = { month: 'short', day: 'numeric', timeZone: 'UTC' }; return date.toLocaleDateString(state.language === 'ta' ? 'ta-IN' : 'en-US', options); }
         function resetJourney() { localStorage.removeItem('smokeFreeJourneyState'); state = {}; location.reload(); }
         function showConfirmModal(type) { 
@@ -628,12 +819,11 @@
         function closeModal(modalId) { const modal = document.getElementById(modalId); modal.querySelector('.modal-content').classList.remove('scale-100'); modal.classList.add('hidden'); }
         function showUrgeModal() { const urgeTips = translations[state.language]?.urgeTips; if (!urgeTips || urgeTips.length === 0) return; let randomIndex; do { randomIndex = Math.floor(Math.random() * urgeTips.length); } while (urgeTips.length > 1 && randomIndex === lastUrgeTipIndex); lastUrgeTipIndex = randomIndex; const randomTip = urgeTips[randomIndex]; if (urgeQuoteEl && urgeModal) { urgeQuoteEl.textContent = randomTip; urgeModal.classList.remove('hidden'); urgeModal.querySelector('.modal-content').classList.add('scale-100'); } }
         function saveState() { 
-            state.currentDate = currentDate.toISOString();
             localStorage.setItem('smokeFreeJourneyState', JSON.stringify(state)); 
         }
-        function loadState() { const savedState = localStorage.getItem('smokeFreeJourneyState'); if (savedState) { state = JSON.parse(savedState); if(state.currentDate) { currentDate = new Date(state.currentDate); } } else { state = { language: 'en', plan: [], startDate: null, initialCount: 0, lastCheckedDate: null }; } }
+        function loadState() { const savedState = localStorage.getItem('smokeFreeJourneyState'); if (savedState) { state = JSON.parse(savedState); } else { state = { language: 'en', plan: [], startDate: null, initialCount: 0, lastCheckedDate: null }; } }
         function render() { renderDashboard(); renderTable(); }
-        function renderTable() { progressTableBody.innerHTML = ''; const todayStr = getTodayDateString(); if (!state.plan) return; state.plan.forEach(day => { const isToday = day.date === todayStr; const rowClass = isToday ? 'bg-slate-700/50 font-semibold' : ''; let statusClass = ''; let statusText = (translations[state.language] && translations[state.language].statusPending) || 'Pending'; if (day.status === 'Pass') { statusClass = 'text-green-400'; statusText = (translations[state.language] && translations[state.language].statusPass) || 'Pass'; } else if (day.status === 'Fail') { statusClass = 'text-red-400'; statusText = (translations[state.language] && translations[state.language].statusFail) || 'Fail'; } else if (day.status === 'Waiting') { statusClass = 'text-amber-400'; statusText = (translations[state.language] && translations[state.language].statusWaiting) || 'Wait'; } const row = `<tr class="${rowClass}"><td class="py-3 px-2">${formatDate(day.date)}</td><td class="py-3 px-2 text-center">${day.target}</td><td class="py-3 px-2 text-center">${day.smoked}</td><td class="py-3 px-2 text-center font-semibold ${statusClass}">${statusText}</td></tr>`; progressTableBody.insertAdjacentHTML('beforeend', row); }); }
+        function renderTable() { progressTableBody.innerHTML = ''; const todayStr = toISODateString(new Date()); if (!state.plan) return; state.plan.forEach(day => { const isToday = day.date === todayStr; const rowClass = isToday ? 'bg-slate-700/50 font-semibold' : ''; let statusClass = ''; let statusText = (translations[state.language] && translations[state.language].statusPending) || 'Pending'; if (day.status === 'Pass') { statusClass = 'text-green-400'; statusText = (translations[state.language] && translations[state.language].statusPass) || 'Pass'; } else if (day.status === 'Fail') { statusClass = 'text-red-400'; statusText = (translations[state.language] && translations[state.language].statusFail) || 'Fail'; } else if (day.status === 'Waiting') { statusClass = 'text-amber-400'; statusText = (translations[state.language] && translations[state.language].statusWaiting) || 'Wait'; } const row = `<tr class="${rowClass}"><td class="py-3 px-2">${formatDate(day.date)}</td><td class="py-3 px-2 text-center">${day.target}</td><td class="py-3 px-2 text-center">${day.smoked}</td><td class="py-3 px-2 text-center font-semibold ${statusClass}">${statusText}</td></tr>`; progressTableBody.insertAdjacentHTML('beforeend', row); }); }
         function startCountdown() { if (countdownInterval) clearInterval(countdownInterval); countdownInterval = setInterval(() => { const now = new Date(); const midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 0); const diff = midnight - now; if (diff <= 1000) { stopCountdown(); setTimeout(() => location.reload(), 1000); return; } const hours = String(Math.floor((diff / (1000 * 60 * 60)) % 24)).padStart(2, '0'); const minutes = String(Math.floor((diff / 1000 / 60) % 60)).padStart(2, '0'); const seconds = String(Math.floor((diff / 1000) % 60)).padStart(2, '0'); const countdownSpan = document.getElementById('countdown-timer'); if (countdownSpan) { countdownSpan.textContent = `${hours}:${minutes}:${seconds}`; } }, 1000); }
         function stopCountdown() { if (countdownInterval) { clearInterval(countdownInterval); countdownInterval = null; } }
         function updateUIForLanguage() { 
@@ -644,18 +834,22 @@
                     el.innerHTML = translations[state.language][key]; 
                 } 
             }); 
+            const runningMessage = document.querySelector('.marquee-text');
+            if(runningMessage && translations[state.language]) {
+                runningMessage.textContent = translations[state.language].runningMessage;
+            }
         }
         
         function checkDailyStatus() {
-            const todayStr = getTodayDateString();
-            if(!state.plan || state.lastCheckedDate === todayStr) return;
+            const todayStr = toISODateString(new Date());
+            if(!state.plan || !state.lastCheckedDate || state.lastCheckedDate === todayStr) return;
             
             let showMotivation = false;
             
             state.plan.forEach(day => {
                 if (day.date < todayStr && (day.status === 'Pending' || day.status === 'Waiting')) {
                     day.status = day.smoked <= day.target ? 'Pass' : 'Fail';
-                    if (day.date === getYesterdayDateString() && day.status === 'Pass') {
+                    if (day.date === toISODateString(new Date(new Date().setDate(new Date().getDate()-1))) && day.status === 'Pass') {
                         showMotivation = true;
                     }
                 }
@@ -685,8 +879,8 @@
             const count = parseInt(initialCigarettesInput.value);
             if (count > 0) {
                 state.initialCount = count;
-                state.startDate = getTodayDateString();
-                state.lastCheckedDate = getYesterdayDateString();
+                state.startDate = toISODateString(new Date());
+                state.lastCheckedDate = toISODateString(new Date(new Date().setDate(new Date().getDate()-1)));
                 generatePlan();
                 saveState();
                 showScreen('main');
@@ -702,7 +896,15 @@
                 render(); 
             }
         }
-
+        
+        function updateLivesDisplay() {
+            gameLivesEl.innerHTML = '';
+            for(let i=0; i < 3; i++) {
+                const heart = document.createElement('span');
+                heart.textContent = i < lives ? '❤️' : '🖤';
+                gameLivesEl.appendChild(heart);
+            }
+        }
 
         init();
     </script>
