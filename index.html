@@ -48,7 +48,10 @@
         <!-- Header -->
         <header id="app-header" class="flex justify-between items-center mb-6 pb-4 border-b border-slate-700/50">
             <h1 class="text-2xl font-bold text-cyan-400 tracking-wide" data-translate="appTitle">Smoke-Free Journey</h1>
-            <button id="language-switcher" class="px-3 py-1 text-sm font-semibold bg-slate-800 rounded-full hover:bg-slate-700 transition-colors shadow-md">தமிழ்</button>
+            <div class="flex items-center space-x-4">
+                <button id="start-over-button" class="hidden text-xs text-slate-400 hover:text-white transition-colors" data-translate="startOverButton">Start Over</button>
+                <button id="language-switcher" class="px-3 py-1 text-sm font-semibold bg-slate-800 rounded-full hover:bg-slate-700 transition-colors shadow-md">தமிழ்</button>
+            </div>
         </header>
 
         <!-- Initial Setup Screen -->
@@ -120,11 +123,14 @@
     </div>
     
     <!-- Modals -->
-    <div id="generic-modal" class="fixed inset-0 bg-black bg-opacity-75 backdrop-blur-sm flex items-center justify-center p-4 hidden modal-overlay">
+    <div id="confirm-modal" class="fixed inset-0 bg-black bg-opacity-75 backdrop-blur-sm flex items-center justify-center p-4 hidden modal-overlay">
         <div class="bg-slate-800 rounded-2xl p-6 w-full max-w-sm mx-auto text-center modal-content transform scale-95 shadow-2xl border border-slate-700">
-            <h3 id="generic-modal-title" class="text-xl font-bold mb-4 text-cyan-400">Notice</h3>
-            <p id="generic-modal-text" class="text-slate-300 mb-6">Message goes here.</p>
-            <button onclick="closeModal('generic-modal')" class="w-full bg-cyan-500 hover:bg-cyan-600 text-slate-900 font-bold py-2 px-4 rounded-lg">Close</button>
+            <h3 id="confirm-modal-title" class="text-xl font-bold mb-4 text-amber-400">Are you sure?</h3>
+            <p id="confirm-modal-text" class="text-slate-300 mb-6">This action cannot be undone.</p>
+            <div class="flex justify-center space-x-4">
+                <button id="confirm-no-button" class="w-full bg-slate-600 hover:bg-slate-700 text-white font-bold py-2 px-4 rounded-lg">Cancel</button>
+                <button id="confirm-yes-button" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg">Yes</button>
+            </div>
         </div>
     </div>
     <div id="urge-modal" class="fixed inset-0 bg-black bg-opacity-75 backdrop-blur-sm flex items-center justify-center p-4 hidden modal-overlay">
@@ -152,9 +158,14 @@
         const urgeButton = document.getElementById('urge-button');
         const runningMessageEl = document.getElementById('running-message');
         const progressTableBody = document.getElementById('progress-table-body');
-        const genericModal = document.getElementById('generic-modal');
-        const genericModalTitle = document.getElementById('generic-modal-title');
-        const genericModalText = document.getElementById('generic-modal-text');
+        const startOverButton = document.getElementById('start-over-button');
+        
+        const confirmModal = document.getElementById('confirm-modal');
+        const confirmModalTitle = document.getElementById('confirm-modal-title');
+        const confirmModalText = document.getElementById('confirm-modal-text');
+        const confirmYesButton = document.getElementById('confirm-yes-button');
+        const confirmNoButton = document.getElementById('confirm-no-button');
+
         const urgeModal = document.getElementById('urge-modal');
         const urgeQuoteEl = document.getElementById('urge-quote');
 
@@ -167,6 +178,9 @@
         const translations = {
              en: {
                 appTitle: "Smoke-Free Journey",
+                startOverButton: "Start Over",
+                confirmStartOverTitle: "Start Over?",
+                confirmStartOverText: "All your progress will be lost. Are you sure you want to restart your journey?",
                 welcomeTitle: "Welcome!",
                 welcomeSubtitle: "Let's start your journey to a smoke-free life.",
                 initialCigarettesLabel: "How many cigarettes do you smoke per day?",
@@ -202,6 +216,9 @@
             },
             ta: {
                 appTitle: "புகைப்பிடிக்காத பயணம்",
+                startOverButton: "மீண்டும் தொடங்கு",
+                confirmStartOverTitle: "மீண்டும் தொடங்கவா?",
+                confirmStartOverText: "உங்கள் முன்னேற்றம் அனைத்தும் இழக்கப்படும். உங்கள் பயணத்தை மீண்டும் தொடங்க விரும்புகிறீர்களா?",
                 welcomeTitle: "வாருங்கள்!", 
                 welcomeSubtitle: "புகையற்ற வாழ்க்கையை நோக்கிய உங்கள் பயணத்தைத் தொடங்குவோம்.",
                 initialCigarettesLabel: "ஒரு நாளைக்கு எத்தனை சிகரெட் புகைக்கிறீர்கள்?",
@@ -264,6 +281,15 @@
             languageSwitcher.addEventListener('click', toggleLanguage);
             smokedButton.addEventListener('click', handleSmokedClick);
             urgeButton.addEventListener('click', showUrgeModal);
+            startOverButton.addEventListener('click', () => showConfirmModal('startOver'));
+            confirmNoButton.addEventListener('click', () => closeModal('confirm-modal'));
+            confirmYesButton.addEventListener('click', resetJourney);
+        }
+
+        function resetJourney() {
+            localStorage.removeItem('smokeFreeJourneyState');
+            state = {}; // Clear state
+            location.reload(); // Easiest way to reset everything
         }
 
         function startJourney(e) {
@@ -284,10 +310,17 @@
             setupScreen.classList.add('hidden');
             mainScreen.classList.add('hidden');
             congratsScreen.classList.add('hidden');
+            startOverButton.classList.add('hidden');
 
-            if(screenName === 'setup') setupScreen.classList.remove('hidden');
-            if(screenName === 'main') mainScreen.classList.remove('hidden');
-            if(screenName === 'congrats') congratsScreen.classList.remove('hidden');
+            if(screenName === 'setup') {
+                setupScreen.classList.remove('hidden');
+            } else if(screenName === 'main') {
+                mainScreen.classList.remove('hidden');
+                startOverButton.classList.remove('hidden');
+            } else if(screenName === 'congrats') {
+                congratsScreen.classList.remove('hidden');
+                startOverButton.classList.remove('hidden');
+            }
         }
 
         function toggleLanguage() {
@@ -336,14 +369,17 @@
         function generatePlan() { 
             state.plan = []; 
             let currentDate = new Date(); 
-            let weekCounter = 0; 
+            let dayCounter = 0; 
             while(true) { 
-                const weekNumber = Math.floor(weekCounter / 7); 
-                const dailyTarget = Math.max(0, state.initialCount - 1 - weekNumber); 
+                const weekNumber = Math.floor(dayCounter / 7);
+                const dailyTarget = Math.max(0, state.initialCount - weekNumber);
+                
                 state.plan.push({ date: toISODateString(currentDate), target: dailyTarget, smoked: 0, status: 'Pending' }); 
+                
                 if (dailyTarget === 0) break; 
+                
                 currentDate.setDate(currentDate.getDate() + 1); 
-                weekCounter++; 
+                dayCounter++; 
             } 
         }
 
@@ -417,9 +453,10 @@
                 const now = new Date(); 
                 const midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 0); 
                 const diff = midnight - now; 
-                if (diff <= 0) { 
+                if (diff <= 1000) { // Check if we are within a second of midnight
                     stopCountdown(); 
-                    location.reload(); 
+                    // Use a timeout to ensure reload happens after midnight
+                    setTimeout(() => location.reload(), 1000);
                     return; 
                 } 
                 const hours = String(Math.floor((diff / (1000 * 60 * 60)) % 24)).padStart(2, '0'); 
@@ -439,17 +476,33 @@
             } 
         }
 
+        function showConfirmModal(type) {
+            if (type === 'startOver') {
+                confirmModalTitle.textContent = translations[state.language].confirmStartOverTitle;
+                confirmModalText.textContent = translations[state.language].confirmStartOverText;
+            }
+            confirmModal.classList.remove('hidden');
+            confirmModal.querySelector('.modal-content').classList.add('scale-100');
+        }
+
         function showModal(title, text) {
-            genericModalTitle.textContent = title;
-            genericModalText.textContent = text;
-            genericModal.classList.remove('hidden');
-            genericModal.querySelector('.modal-content').classList.add('scale-100');
+             // Re-purposing confirm modal as a generic notice modal
+            confirmModalTitle.textContent = title;
+            confirmModalText.textContent = text;
+            confirmYesButton.classList.add('hidden');
+            confirmNoButton.textContent = "Close";
+            confirmModal.classList.remove('hidden');
+            confirmModal.querySelector('.modal-content').classList.add('scale-100');
         }
 
         function closeModal(modalId) {
             const modal = document.getElementById(modalId);
             modal.querySelector('.modal-content').classList.remove('scale-100');
             modal.classList.add('hidden');
+            // Reset confirm modal buttons if needed
+            confirmYesButton.classList.remove('hidden');
+            confirmNoButton.textContent = "Cancel";
+
         }
 
         function showUrgeModal() {
@@ -485,10 +538,30 @@
         }
         
         function getTodayEntry() { if (!state.plan) return null; return state.plan.find(day => day.date === getTodayDateString()); }
+        
+        // Timezone-safe date string functions
+        function toISODateString(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
         function getTodayDateString() { return toISODateString(new Date()); }
-        function getYesterdayDateString() { const yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1); return toISODateString(yesterday); }
-        function toISODateString(date) { return date.toISOString().split('T')[0]; }
-        function formatDate(dateString) { const date = new Date(dateString); const options = { month: 'short', day: 'numeric' }; return date.toLocaleDateString(state.language === 'ta' ? 'ta-IN' : 'en-US', options); }
+        
+        function getYesterdayDateString() { 
+            const yesterday = new Date(); 
+            yesterday.setDate(yesterday.getDate() - 1); 
+            return toISODateString(yesterday); 
+        }
+
+        function formatDate(dateString) { 
+            // Add timeZone to ensure consistency, though toISODateString handles the main logic
+            const date = new Date(dateString + 'T00:00:00'); 
+            const options = { month: 'short', day: 'numeric', timeZone: 'UTC' }; 
+            return date.toLocaleDateString(state.language === 'ta' ? 'ta-IN' : 'en-US', options); 
+        }
+
         function updateUIForLanguage() { 
             languageSwitcher.textContent = state.language === 'en' ? 'தமிழ்' : 'English'; 
             document.querySelectorAll('[data-translate]').forEach(el => { 
