@@ -145,10 +145,23 @@ define("scripts/control.js", function(exports){
 	exports.fixCanvasPos = function(){
 		var de = document.documentElement;
 	
-		var fix = function(e){
-		    canvasLeft = (de.clientWidth - 640) / 2;
-		    canvasTop = (de.clientHeight - 480) / 2 - 40;
-		};
+		var layer = document.querySelector(".layer"); // Find the layer div
+    var paper = require("scripts/layer").getLayer(); // Get the Raphael paper instance
+
+	var fix = function(e){
+        // Position the canvas at the top-left
+	    canvasLeft = 0;
+	    canvasTop = 0;
+
+        // If the window size has changed, update the canvas size
+        if (paper.width !== window.innerWidth || paper.height !== window.innerHeight) {
+            paper.setSize(window.innerWidth, window.innerHeight);
+            if(layer) {
+                layer.style.width = window.innerWidth + "px";
+                layer.style.height = window.innerHeight + "px";
+            }
+        }
+	};
 	
 		fix();
 	
@@ -355,7 +368,8 @@ define("scripts/layer.js", function(exports){
 		}else{
 			layer = Ucren.makeElement( "div", { "class": "layer", "style": "z-index: " + ( zindexs[name] || 0 ) + ";" } );
 			Ucren.Element( "extra" ).add( layer );
-			p = layers[name] = Raphael( layer, 640, 480 );
+			
+p = layers[name] = Raphael( layer, window.innerWidth, window.innerHeight );
 			// if( Ucren.isSafari )
 			//     p.safari();
 			return p;
