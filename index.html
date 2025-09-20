@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Smoke-Free Journey</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -12,152 +12,197 @@
         body {
             font-family: 'Inter', sans-serif;
             -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
         }
-        .fade-in {
-            animation: fadeIn 0.5s ease-in-out;
-        }
+        .fade-in { animation: fadeIn 0.5s ease-in-out; }
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(-10px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        .modal-overlay {
-            transition: opacity 0.3s ease-in-out;
+        .modal-overlay, .sos-overlay { transition: opacity 0.3s ease-in-out; }
+        .modal-content, .sos-content { transition: transform 0.3s ease-in-out; }
+        
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        /* Breathing Animation */
+        #breathing-circle-container {
+            position: relative;
+            width: 200px;
+            height: 200px;
         }
-        .modal-content {
-            transition: transform 0.3s ease-in-out;
+        #breathing-glow {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle, rgba(34, 211, 238, 0.3) 0%, rgba(34, 211, 238, 0) 70%);
+            border-radius: 50%;
+            transition: transform 4s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .marquee-container {
-            overflow: hidden;
-            white-space: nowrap;
-        }
-        .marquee-text {
-            display: inline-block;
-            padding-left: 100%;
-            animation: marquee 25s linear infinite;
-        }
-        @keyframes marquee {
-            0%   { transform: translateX(0); }
-            100% { transform: translateX(-100%); }
-        }
-        /* Professional scrollbar styling */
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #4A5568;
-            border-radius: 3px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #718096;
+        #breathing-circle {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background-color: #06b6d4; /* cyan-500 */
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 0 30px rgba(34, 211, 238, 0.4);
         }
     </style>
 </head>
-<body class="bg-gradient-to-br from-slate-900 to-gray-900 text-slate-200 antialiased">
+<body class="bg-slate-100 text-slate-800 antialiased">
 
     <!-- Main Container -->
     <div id="app-container" class="min-h-screen max-w-lg mx-auto p-4 flex flex-col fade-in">
         
         <!-- Header -->
-        <header class="flex justify-between items-center mb-6 pb-4 border-b border-slate-700/50">
-            <h1 class="text-2xl font-bold text-cyan-400 tracking-wide" data-translate="appTitle">Smoke-Free Journey</h1>
-            <button id="language-switcher" class="px-3 py-1 text-sm font-semibold bg-slate-800 rounded-full hover:bg-slate-700 transition-colors shadow-md">தமிழ்</button>
+        <header id="app-header" class="flex justify-between items-center mb-6">
+            <h1 class="text-2xl font-bold text-slate-900 tracking-wide" data-translate="appTitle">Smoke-Free Journey</h1>
+            <div class="flex items-center space-x-2">
+                <button id="start-over-button" class="hidden text-xs text-slate-500 hover:text-slate-800 transition-colors" data-translate="startOverButton">Start Over</button>
+                <button id="next-day-button" class="hidden px-2 py-1 text-xs font-semibold bg-white border border-slate-200 text-slate-700 rounded-full hover:bg-slate-50">Advance Day</button>
+                <button id="language-switcher" class="px-3 py-1 text-sm font-semibold bg-white border border-slate-200 text-slate-700 rounded-full hover:bg-slate-50 transition-colors shadow-sm">தமிழ்</button>
+            </div>
         </header>
 
         <!-- Initial Setup Screen -->
-        <div id="setup-screen" class="flex-grow flex flex-col justify-center items-center text-center p-4">
-            <div class="w-full bg-slate-800/50 p-8 rounded-2xl shadow-2xl">
-                <h2 class="text-3xl font-bold mb-2" data-translate="welcomeTitle">Welcome!</h2>
-                <p class="text-slate-400 mb-8" data-translate="welcomeSubtitle">Let's start your journey to a smoke-free life.</p>
-                <form id="setup-form" class="space-y-6">
-                    <label for="initial-cigarettes" class="block text-lg font-medium mb-2" data-translate="initialCigarettesLabel">How many cigarettes do you smoke per day?</label>
-                    <input type="number" id="initial-cigarettes" class="w-full bg-slate-900 border-2 border-slate-700 text-white text-center text-3xl rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition" placeholder="e.g., 15" required min="1">
-                    <button type="submit" class="w-full bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white font-bold py-3 px-4 rounded-lg transition-transform transform hover:scale-105 shadow-lg shadow-cyan-500/20" data-translate="startButton">Start Journey</button>
-                </form>
-            </div>
+        <div id="setup-screen" class="hidden flex-grow flex flex-col justify-center items-center text-center p-4">
+             <div class="w-full bg-white border border-slate-200 p-8 rounded-2xl shadow-lg">
+                 <h2 class="text-3xl font-bold mb-2 text-slate-900" data-translate="welcomeTitle">Welcome!</h2>
+                 <p class="text-slate-500 mb-8" data-translate="welcomeSubtitle">Let's start your journey to a smoke-free life.</p>
+                 <form id="setup-form" class="space-y-6">
+                     <label for="initial-cigarettes" class="block text-lg font-medium mb-2" data-translate="initialCigarettesLabel">How many cigarettes do you smoke per day?</label>
+                     <input type="number" id="initial-cigarettes" class="w-full bg-slate-50 border-2 border-slate-300 text-slate-900 text-center text-3xl rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-cyan-500 transition" placeholder="e.g., 15" required min="1">
+                     <button type="submit" class="w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:opacity-90 text-white font-bold py-3 px-4 rounded-lg transition-transform transform hover:scale-105 shadow-lg shadow-cyan-500/20" data-translate="startButton">Start Journey</button>
+                 </form>
+             </div>
         </div>
 
-        <!-- Main App Screen (hidden by default) -->
+        <!-- Main App Screen -->
         <div id="main-screen" class="hidden flex-grow flex flex-col">
+
             <!-- Dashboard -->
             <div class="grid grid-cols-2 gap-4 mb-6 text-center">
-                <div class="bg-slate-800/70 p-4 rounded-xl shadow-lg flex items-center justify-center space-x-4">
-                    <svg class="w-8 h-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
-                    <div>
-                        <p class="text-sm text-slate-400" data-translate="todaysTarget">Today's Target</p>
-                        <p id="target-count" class="text-4xl font-bold text-green-400">14</p>
-                    </div>
-                </div>
-                <div class="bg-slate-800/70 p-4 rounded-xl shadow-lg flex items-center justify-center space-x-4">
-                     <svg class="w-8 h-8 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.657 7.343A8 8 0 0117.657 18.657z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.343 17.657a8 8 0 0110.607-10.607L15 12l-4.657 5.657z"></path></svg>
-                    <div>
-                        <p class="text-sm text-slate-400" data-translate="smokedToday">Smoked Today</p>
-                        <p id="smoked-count" class="text-4xl font-bold">0</p>
-                    </div>
-                </div>
+                 <div class="bg-white border border-slate-200 p-4 rounded-xl shadow-sm flex flex-col items-center justify-center">
+                     <p class="text-sm text-slate-500" data-translate="todaysTarget">Today's Target</p>
+                     <p id="target-count" class="text-4xl font-bold text-cyan-500">0</p>
+                 </div>
+                 <div class="bg-white border border-slate-200 p-4 rounded-xl shadow-sm flex flex-col items-center justify-center">
+                     <p class="text-sm text-slate-500" data-translate="smokedToday">Smoked Today</p>
+                     <p id="smoked-count" class="text-4xl font-bold text-slate-800">0</p>
+                 </div>
             </div>
 
-            <!-- Action Buttons -->
+             <!-- Action Buttons -->
             <div class="mb-6 space-y-3">
-                <button id="smoked-button" class="w-full bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-700 hover:to-red-700 text-white font-bold py-4 px-4 rounded-lg text-lg transition-transform transform hover:scale-105 shadow-lg shadow-red-500/20" data-translate="smokedButton">I Smoked a Cigarette</button>
-                <div id="limit-reached-controls" class="hidden grid grid-cols-2 gap-3">
-                    <button id="limit-reached-button" class="w-full bg-slate-800 text-amber-400 font-bold py-3 px-4 rounded-lg text-sm text-center shadow-md"></button>
-                    <button id="urge-button" class="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white font-bold py-3 px-4 rounded-lg text-sm text-center shadow-lg shadow-cyan-500/20" data-translate="urgeButton">Had an Urge?</button>
-                </div>
+                 <button id="smoked-button" class="w-full bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold py-4 px-4 rounded-lg text-lg transition-transform transform hover:scale-105 shadow-sm" data-translate="smokedButton">I Smoked a Cigarette</button>
+                 <div id="limit-reached-controls" class="hidden">
+                     <button id="limit-reached-button" class="w-full bg-white border border-slate-200 text-amber-500 font-bold py-3 px-4 rounded-lg text-sm text-center shadow-sm mb-3"></button>
+                 </div>
+                 <button id="urge-button" class="w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:opacity-90 text-white font-bold py-4 px-4 rounded-lg text-lg transition-transform transform hover:scale-105 shadow-lg shadow-cyan-500/20" data-translate="urgeButton">Had an Urge?</button>
             </div>
             
             <!-- Running Message -->
-            <div class="bg-slate-800/50 rounded-lg p-2 mb-6 marquee-container shadow-md">
-                 <p id="running-message" class="text-cyan-300 text-sm marquee-text"></p>
+            <div class="bg-white border border-slate-200 rounded-lg p-2 mb-6 shadow-sm">
+                 <p class="text-cyan-600 text-sm" data-translate="runningMessage"></p>
             </div>
-
-            <!-- Progress Log -->
-            <div class="flex-grow bg-slate-800/50 rounded-xl p-4 overflow-y-auto shadow-inner">
-                <h3 class="text-lg font-bold mb-4 text-slate-300" data-translate="progressLogTitle">Progress Log</h3>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-sm text-left">
-                        <thead class="text-xs text-slate-400 uppercase">
-                            <tr>
-                                <th scope="col" class="py-3 px-2" data-translate="dateHeader">Date</th>
-                                <th scope="col" class="py-3 px-2 text-center" data-translate="targetHeader">Target</th>
-                                <th scope="col" class="py-3 px-2 text-center" data-translate="smokedHeader">Smoked</th>
-                                <th scope="col" class="py-3 px-2 text-center" data-translate="statusHeader">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody id="progress-table-body" class="divide-y divide-slate-700/50"></tbody>
-                    </table>
-                </div>
+            
+             <!-- Progress Log -->
+             <div class="flex-grow bg-white border border-slate-200 rounded-xl p-4 overflow-y-auto shadow-sm min-h-0">
+                 <h3 class="text-lg font-bold mb-4 text-slate-900" data-translate="progressLogTitle">Progress Log</h3>
+                 <div class="overflow-x-auto">
+                     <table class="w-full text-sm text-left">
+                         <thead class="text-xs text-slate-500 uppercase">
+                             <tr>
+                                 <th scope="col" class="py-3 px-2" data-translate="dateHeader">Date</th>
+                                 <th scope="col" class="py-3 px-2 text-center" data-translate="targetHeader">Target</th>
+                                 <th scope="col" class="py-3 px-2 text-center" data-translate="smokedHeader">Smoked</th>
+                                 <th scope="col" class="py-3 px-2 text-center" data-translate="statusHeader">Status</th>
+                                 <th scope="col" class="py-3 px-2 text-center" data-translate="progressHeader">Progress</th>
+                             </tr>
+                         </thead>
+                         <tbody id="progress-table-body" class="divide-y divide-slate-200"></tbody>
+                     </table>
+                 </div>
             </div>
         </div>
         
         <!-- Congratulations Screen -->
         <div id="congrats-screen" class="hidden flex-grow flex flex-col justify-center items-center text-center p-4">
              <div class="text-7xl mb-4">🎉</div>
-             <h2 class="text-4xl font-bold text-green-400 mb-2" data-translate="congratsTitle">Congratulations!</h2>
-             <p class="text-slate-300 mb-8 max-w-md" data-translate="congratsSubtitle">You have completed your journey and are now smoke-free! We are proud of you.</p>
+             <h2 class="text-4xl font-bold text-cyan-500 mb-2" data-translate="congratsTitle">You Made It!</h2>
+             <p class="text-slate-600 mb-6 max-w-md" data-translate="congratsSubtitle">You have completed your journey and are now smoke-free! We are proud of you.</p>
+             <p class="text-slate-500 text-sm italic max-w-md" data-translate="congratsQuote">"Don't compromise on a single cigarette. The journey was long, but your freedom is worth it. Stay vigilant, stay strong."</p>
         </div>
     </div>
     
     <!-- Modals -->
-    <div id="motivation-modal" class="fixed inset-0 bg-black bg-opacity-75 backdrop-blur-sm flex items-center justify-center p-4 hidden modal-overlay">
-        <div class="bg-slate-800 rounded-2xl p-6 w-full max-w-sm mx-auto text-center modal-content transform scale-95 shadow-2xl border border-slate-700">
-             <div class="text-5xl mb-4">🌟</div>
-            <h3 class="text-xl font-bold mb-4 text-green-400" data-translate="motivationTitle">Great Job Yesterday!</h3>
-            <p id="motivation-quote" class="text-slate-300 italic mb-6">"The secret of getting ahead is getting started."</p>
-            <button onclick="closeModal('motivation-modal')" class="w-full bg-cyan-500 hover:bg-cyan-600 text-slate-900 font-bold py-2 px-4 rounded-lg" data-translate="motivationKeepGoingButton">Keep Going!</button>
+    <div id="confirm-modal" class="fixed inset-0 bg-black bg-opacity-75 backdrop-blur-sm flex items-center justify-center p-4 hidden modal-overlay">
+        <div class="bg-white rounded-2xl p-6 w-full max-w-sm mx-auto text-center modal-content transform scale-95 shadow-2xl border border-slate-200">
+            <h3 id="confirm-modal-title" class="text-xl font-bold mb-4 text-amber-500">Are you sure?</h3>
+            <p id="confirm-modal-text" class="text-slate-600 mb-6">This action cannot be undone.</p>
+            <div class="flex justify-center space-x-4">
+                <button id="confirm-no-button" class="w-full bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold py-2 px-4 rounded-lg">Cancel</button>
+                <button id="confirm-yes-button" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg">Yes</button>
+            </div>
         </div>
     </div>
 
-    <div id="urge-modal" class="fixed inset-0 bg-black bg-opacity-75 backdrop-blur-sm flex items-center justify-center p-4 hidden modal-overlay">
-        <div class="bg-slate-800 rounded-2xl p-6 w-full max-w-sm mx-auto text-center modal-content transform scale-95 shadow-2xl border border-slate-700">
-             <div class="text-5xl mb-4">💪</div>
-            <h3 class="text-xl font-bold mb-4 text-cyan-400" data-translate="urgeTitle">Stay Strong!</h3>
-            <p id="urge-quote" class="text-slate-300 mb-6">"A craving is just a thought. You are in control, not the thought."</p>
-            <button onclick="closeModal('urge-modal')" class="w-full bg-cyan-500 hover:bg-cyan-600 text-slate-900 font-bold py-2 px-4 rounded-lg" data-translate="urgeCloseButton">I Can Do This!</button>
+    <!-- SOS Screen -->
+    <div id="sos-screen" class="fixed inset-0 bg-slate-100 p-4 hidden sos-overlay flex-col justify-center items-center">
+        <div class="w-full h-full text-center sos-content flex flex-col items-center justify-center">
+            <!-- Main SOS Menu -->
+            <div id="sos-menu" class="w-full max-w-md">
+                <h2 class="text-3xl font-bold text-cyan-600 mb-2" data-translate="sosTitle">Craving Emergency</h2>
+                <p class="text-slate-500 mb-8" data-translate="sosSubtitle">You are stronger than this craving. Choose an option below.</p>
+                <div class="space-y-4">
+                    <button data-sos="breathing" class="w-full bg-white hover:bg-slate-50 border border-slate-200 text-slate-800 font-bold py-4 rounded-lg text-lg" data-translate="sosBreathing">Breathing Exercise</button>
+                    <button data-sos="motivation" class="w-full bg-white hover:bg-slate-50 border border-slate-200 text-slate-800 font-bold py-4 rounded-lg text-lg" data-translate="sosMotivation">Get Motivation</button>
+                    <a href="game/index.html" class="block">
+                        <button class="w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:opacity-90 text-white font-bold py-4 rounded-lg text-lg" data-translate="sosGame">Play a Game</button>
+                    </a>
+                </div>
+                <button id="sos-close-button" class="mt-8 text-slate-500 hover:text-slate-800" data-translate="sosClose">I'm okay now, close this.</button>
+            </div>
+            
+            <!-- Breathing Exercise -->
+            <div id="sos-breathing-view" class="hidden flex flex-col items-center justify-center">
+                 <h3 class="text-2xl font-bold mb-4" data-translate="breathingTitle">Follow the Guide</h3>
+                 <div id="breathing-animation-view" class="flex flex-col items-center">
+                    <div id="breathing-circle-container" class="mx-auto flex items-center justify-center">
+                        <div id="breathing-glow"></div>
+                        <div id="breathing-circle">
+                            <p id="breathing-text" class="text-3xl font-bold text-white transition-opacity duration-500">Start</p>
+                        </div>
+                    </div>
+                    <p id="breathing-phase-timer" class="text-4xl font-mono mt-4 text-slate-700">4</p>
+                    <p class="text-xl mt-2 text-slate-600">Overall Time: <span id="breathing-main-timer">120</span>s</p>
+                    <button id="breathing-back-button" class="mt-6 bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold py-2 px-6 rounded-full text-sm" data-translate="backButton">Back to Menu</button>
+                 </div>
+                 <div id="breathing-complete-view" class="hidden">
+                     <p class="text-2xl text-green-500 font-bold mb-4" data-translate="breathingCompleteTitle">Well Done!</p>
+                     <p class="text-slate-600" data-translate="breathingCompleteText">You took control. The craving has less power now. Keep going!</p>
+                     <button id="breathing-done-button" class="mt-8 bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold py-2 px-6 rounded-full" data-translate="feelBetterButton">I Feel Better</button>
+                 </div>
+            </div>
+
+             <!-- Motivation -->
+            <div id="sos-motivation-view" class="hidden w-full max-w-md">
+                 <h3 class="text-2xl font-bold mb-4" data-translate="motivationTitle">A Powerful Reminder</h3>
+                 <div class="bg-white border border-slate-200 p-6 rounded-lg min-h-[150px] flex items-center justify-center">
+                    <p id="motivation-quote-text" class="text-lg italic text-slate-600"></p>
+                 </div>
+                 <div class="mt-8 flex space-x-4">
+                    <button id="motivation-back-button" class="w-full bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold py-2 px-6 rounded-full" data-translate="backButton">Back to Menu</button>
+                 </div>
+            </div>
         </div>
     </div>
+
 
     <script>
         // --- DOM Elements ---
@@ -173,153 +218,388 @@
         const limitReachedControls = document.getElementById('limit-reached-controls');
         const limitReachedButton = document.getElementById('limit-reached-button');
         const urgeButton = document.getElementById('urge-button');
-        const runningMessageEl = document.getElementById('running-message');
         const progressTableBody = document.getElementById('progress-table-body');
+        const startOverButton = document.getElementById('start-over-button');
         
-        const motivationModal = document.getElementById('motivation-modal');
-        const motivationQuoteEl = document.getElementById('motivation-quote');
-        const urgeModal = document.getElementById('urge-modal');
-        const urgeQuoteEl = document.getElementById('urge-quote');
+        // --- Modals & SOS Screen ---
+        const confirmModal = document.getElementById('confirm-modal');
+        const sosScreen = document.getElementById('sos-screen');
+        const sosMenu = document.getElementById('sos-menu');
+        const sosBreathingView = document.getElementById('sos-breathing-view');
+        const sosMotivationView = document.getElementById('sos-motivation-view');
+        const sosCloseButton = document.getElementById('sos-close-button');
+        const breathingCircle = document.getElementById('breathing-circle');
+        const breathingGlow = document.getElementById('breathing-glow');
+        const breathingText = document.getElementById('breathing-text');
+        const breathingPhaseTimerEl = document.getElementById('breathing-phase-timer');
+        const breathingMainTimerEl = document.getElementById('breathing-main-timer');
+        const breathingAnimationView = document.getElementById('breathing-animation-view');
+        const breathingCompleteView = document.getElementById('breathing-complete-view');
+        const motivationQuoteText = document.getElementById('motivation-quote-text');
+        const nextDayButton = document.getElementById('next-day-button');
 
         // --- App State ---
-        let state = { language: 'en', plan: [], startDate: null, initialCount: 0, lastCheckedDate: null };
+        let state = {}; 
         let countdownInterval = null;
-        let lastUrgeTipIndex = -1;
+        let lastMotivationQuoteIndex = -1;
+        let mockDate = null;
         
-        // --- Translations, Quotes & Messages ---
+        // SOS State
+        let breathingIntervals = [];
+
+        // --- Translations ---
         const translations = {
-            en: {
+             en: {
                 appTitle: "Smoke-Free Journey",
-                welcomeTitle: "Welcome!",
-                welcomeSubtitle: "Let's start your journey to a smoke-free life.",
-                initialCigarettesLabel: "How many cigarettes do you smoke per day?",
-                startButton: "Start Journey",
-                todaysTarget: "Today's Target",
-                smokedToday: "Smoked Today",
-                smokedButton: "I Smoked a Cigarette",
-                progressLogTitle: "Progress Log",
-                dateHeader: "Date",
-                targetHeader: "Target",
-                smokedHeader: "Smoked",
-                statusHeader: "Status",
-                motivationTitle: "Great Job Yesterday!",
-                motivationKeepGoingButton: "Keep Going!",
-                congratsTitle: "Congratulations!",
-                congratsSubtitle: "You have completed your journey and are now smoke-free! We are proud of you.",
-                runningMessage: "Don't be a slave to a stick of paper and leaves. Break the chains with every craving you conquer.",
+                startOverButton: "Start Over",
                 urgeButton: "Had an Urge?",
-                urgeTitle: "Stay Strong!",
-                urgeCloseButton: "I Can Do This!",
-                limitReachedText: "Next in <span id='countdown-timer' class='text-white'>--:--:--</span>",
-                urgeTips: [
-                    "Take a deep breath and a sip of cold water. Wait 5 minutes, the feeling will pass.",
-                    "Eat something you like! A healthy snack can distract you and satisfy cravings.",
-                    "Successful people are self-controlled. If you can control this, you can achieve anything.",
-                    "Think about why you started. Don't give up on that goal now.",
-                    "Go for a short walk. Changing your environment can break the craving cycle.",
-                    "Chew on some sugar-free gum or a healthy snack. The act of chewing can relieve stress.",
-                    "Listen to your favorite song. Music can instantly lift your mood and distract you from cravings.",
-                    "Text or call a friend or family member for support. A quick chat can make a big difference.",
-                    "Remind yourself of the money you're saving. Think about what you can buy with it.",
-                    "Play a quick game on your phone. Engaging your mind can help the craving pass."
+                sosTitle: "Craving Emergency",
+                sosSubtitle: "You are stronger than this craving. Choose an option below.",
+                sosBreathing: "Breathing Exercise",
+                sosMotivation: "Get Motivation",
+                sosGame: "Play a Game",
+                sosClose: "I'm okay now, close this.",
+                breathingTitle: "Follow the Guide",
+                motivationTitle: "A Powerful Reminder",
+                backButton: "Back to Menu",
+                feelBetterButton: "I Feel Better",
+                breathingCompleteTitle: "Well Done!",
+                breathingCompleteText: "You took control. The craving has less power now. Keep going!",
+                runningMessage: "Don't be a slave to a stick of paper and leaves. Break the chains with every craving you conquer.",
+                limitReachedText: "Next in <span id='countdown-timer' class='text-slate-800'>--:--:--</span>",
+                motivationQuotes: [
+                    "This craving is temporary, but the damage from smoking is permanent. You've come so far. Don't trade your long-term health for a short-term impulse.",
+                    "Remember your 'why'. Picture the healthier, wealthier, and more vibrant life you're building for yourself. Is one cigarette worth giving that up?",
+                    "Every craving you defeat is a victory. You are rewriting your story, one moment of strength at a time. Be proud of this moment.",
+                    "You are not a smoker trying to quit. You are a non-smoker learning to live without cigarettes. Embrace your new identity.",
+                    "Think of this craving as a wave. It feels huge right now, but it will pass. Just ride it out without giving in."
                 ],
-                statusPass: "Pass",
-                statusFail: "Fail",
-                statusPending: "Pending",
-                statusWaiting: "Wait"
-            },
+                congratsTitle: "You Made It!",
+                congratsQuote: "\"Don't compromise on a single cigarette. The journey was long, but your freedom is worth it. Stay vigilant, stay strong.\"",
+                confirmStartOverTitle: "Are you sure you want to start over?",
+                confirmStartOverText: "This is a long and challenging process. Starting again means losing all your hard-earned progress. Don't give up on your freedom so easily!",
+                // ADDED: New translation for the progress header
+                progressHeader: "Progress"
+             },
             ta: {
-                appTitle: "புகைப்பிடிக்காத பயணம்",
-                welcomeTitle: "வாருங்கள்!",
-                welcomeSubtitle: "புகையற்ற வாழ்க்கையை நோக்கிய உங்கள் பயணத்தைத் தொடங்குவோம்.",
-                initialCigarettesLabel: "ஒரு நாளைக்கு எத்தனை சிகரெட் புகைக்கிறீர்கள்?",
-                startButton: "பயணத்தைத் தொடங்கு",
-                todaysTarget: "இன்றைய இலக்கு",
-                smokedToday: "இன்று புகைத்தது",
-                smokedButton: "நான் ஒரு சிகரெட் பிடித்தேன்",
-                progressLogTitle: "முன்னேற்றப் பதிவு",
-                dateHeader: "தேதி",
-                targetHeader: "இலக்கு",
-                smokedHeader: "புகைத்தது",
-                statusHeader: "நிலை",
-                motivationTitle: "நேற்று சிறப்பாக செய்தீர்கள்!",
-                motivationKeepGoingButton: "தொடர்ந்து முன்னேறு!",
-                congratsTitle: "வாழ்த்துக்கள்!",
-                congratsSubtitle: "உங்கள் பயணத்தை வெற்றிகரமாக முடித்துவிட்டீர்கள், இப்போது நீங்கள் புகைப்பிடிக்காதவர்! உங்களை நினைத்து நாங்கள் பெருமைப்படுகிறோம்.",
-                runningMessage: "ஒரு காகிதத்திற்கும் இலைகளுக்கும் அடிமையாக இருக்காதீர்கள். நீங்கள் வெல்லும் ஒவ்வொரு ஏக்கத்துடனும் சங்கிலிகளை உடைக்கவும்.",
-                urgeButton: "ஒரு ஆசையா?",
-                urgeTitle: "திடமாக இருங்கள்!",
-                urgeCloseButton: "என்னால் முடியும்!",
-                limitReachedText: "அடுத்து <span id='countdown-timer' class='text-white'>--:--:--</span>",
-                urgeTips: [
-                    "ஆழ்ந்த மூச்சு விடுங்கள், குளிர் நீர் குடியுங்கள். 5 நிமிடங்கள் காத்திருங்கள், அந்த உணர்வு கடந்து போகும்.",
-                    "உங்களுக்குப் பிடித்த ஒன்றைச் சாப்பிடுங்கள்! ஒரு சிற்றுண்டி உங்கள் கவனத்தை திசை திருப்பும்.",
-                    "வெற்றியாளர்கள் தன்னடக்கம் கொண்டவர்கள். இதை உங்களால் கட்டுப்படுத்த முடிந்தால், எதையும் சாதிக்க முடியும்.",
-                    "ஏன் ஆரம்பித்தீர்கள் என்று சிந்தியுங்கள். அந்த இலக்கை இப்போது கைவிடாதீர்கள்.",
-                    "ஒரு சிறிய நடைப்பயிற்சி செல்லுங்கள். உங்கள் சூழலை மாற்றுவது ஆசையின் சுழற்சியை உடைக்கும்.",
-                    "சர்க்கரை இல்லாத பபுள் கம் அல்லது ஆரோக்கியமான சிற்றுண்டியை மெல்லுங்கள். மெல்லும் செயல் மன அழுத்தத்தைக் குறைக்கும்.",
-                    "உங்களுக்குப் பிடித்த பாடலைக் கேளுங்கள். இசை உங்கள் மனநிலையை உடனடியாக உயர்த்தி, ஆசைகளிலிருந்து திசை திருப்பும்.",
-                    "ஆதரவிற்காக ஒரு நண்பர் அல்லது குடும்ப உறுப்பினருக்கு மெசேஜ் அல்லது கால் செய்யுங்கள். ஒரு சிறிய உரையாடல் பெரிய மாற்றத்தை ஏற்படுத்தும்.",
-                    "நீங்கள் சேமிக்கும் பணத்தை நீங்களே நினைவுபடுத்திக் கொள்ளுங்கள். அதைக் கொண்டு என்ன வாங்கலாம் என்று சிந்தியுங்கள்.",
-                    "உங்கள் தொலைபேசியில் ஒரு விரைவான விளையாட்டை விளையாடுங்கள். உங்கள் மனதை ஈடுபடுத்துவது ஆசை கடந்து செல்ல உதவும்."
-                ],
-                statusPass: "வெற்றி",
-                statusFail: "தோல்வி",
-                statusPending: "நிலுவையில்",
-                statusWaiting: "காத்திரு"
+                // Tamil translations would go here
             }
         };
 
-        const quotes = {
-            en: [ "Believe you can and you're halfway there.", "It does not matter how slowly you go as long as you do not stop.", "Success is the sum of small efforts, repeated day in and day out." ],
-            ta: [ "முடியும் என்று நம்புங்கள், நீங்கள் பாதி தூரம் கடந்துவிட்டீர்கள்.", "நீங்கள் நிறுத்தாத வரை எவ்வளவு மெதுவாகச் சென்றாலும் பரவாயில்லை.", "வெற்றி என்பது தினசரி மீண்டும் மீண்டும் செய்யப்படும் சிறு முயற்சிகளின் கூட்டுத்தொகை." ]
-        };
-
-        // --- Core Functions ---
+        // --- Core App Functions ---
         function init() {
             loadState();
             updateUIForLanguage();
-            
-            if (state.plan.length > 0) {
-                const finalDay = state.plan[state.plan.length -1];
-                if(finalDay.target === 0 && finalDay.status === 'Pass'){
-                    showScreen('congrats');
-                } else {
-                    showScreen('main');
-                    render();
-                    checkDailyStatus();
-                }
+            if (state.plan && state.plan.length > 0) {
+                 const finalDay = state.plan[state.plan.length -1];
+                 if(finalDay.target === 0 && finalDay.status === 'Pass'){
+                     showScreen('congrats');
+                 } else {
+                     showScreen('main');
+                     render();
+                     checkDailyStatus();
+                 }
             } else {
                 showScreen('setup');
             }
             setupEventListeners();
         }
+        
+        function showScreen(screenName) {
+            setupScreen.classList.add('hidden');
+            mainScreen.classList.add('hidden');
+            congratsScreen.classList.add('hidden');
+            startOverButton.classList.add('hidden');
+            nextDayButton.classList.add('hidden');
+            
+            if(screenName === 'setup') {
+                setupScreen.classList.remove('hidden');
+            } else if(screenName === 'main' || screenName === 'congrats') {
+                if(screenName === 'main') mainScreen.classList.remove('hidden');
+                if(screenName === 'congrats') congratsScreen.classList.remove('hidden');
+                startOverButton.classList.remove('hidden');
+                nextDayButton.classList.remove('hidden');
+                if (screenName === 'congrats') stopCountdown();
+            }
+        }
 
         function setupEventListeners() {
-            languageSwitcher.addEventListener('click', toggleLanguage);
             setupForm.addEventListener('submit', startJourney);
+            languageSwitcher.addEventListener('click', toggleLanguage);
             smokedButton.addEventListener('click', handleSmokedClick);
-            urgeButton.addEventListener('click', showUrgeModal);
+            urgeButton.addEventListener('click', showSosScreen);
+            startOverButton.addEventListener('click', () => showConfirmModal('startOver'));
+            document.getElementById('confirm-no-button').addEventListener('click', () => closeModal('confirm-modal'));
+            document.getElementById('confirm-yes-button').addEventListener('click', resetJourney);
+            nextDayButton.addEventListener('click', advanceDay);
+
+            sosCloseButton.addEventListener('click', hideSosScreen);
+            document.querySelectorAll('[data-sos]').forEach(btn => {
+                if (btn.dataset.sos !== 'game') {
+                    btn.addEventListener('click', () => handleSosChoice(btn.dataset.sos));
+                }
+            });
+            document.getElementById('breathing-done-button').addEventListener('click', () => showSosView('menu'));
+            document.getElementById('breathing-back-button').addEventListener('click', () => showSosView('menu'));
+            document.getElementById('motivation-back-button').addEventListener('click', () => showSosView('menu'));
         }
         
-        function toggleLanguage() {
-            state.language = state.language === 'en' ? 'ta' : 'en';
-            saveState();
-            updateUIForLanguage();
-            if (state.plan.length > 0) {
-                render(); 
+        function generatePlan() { 
+            state.plan = []; 
+            let planDate = new Date();
+            let dayCounter = 0; 
+            while(true) { 
+                const weekNumber = Math.floor(dayCounter / 7);
+                const dailyTarget = Math.max(0, state.initialCount - weekNumber);
+                state.plan.push({ date: toISODateString(planDate), target: dailyTarget, smoked: 0, status: 'Pending' }); 
+                if (dailyTarget === 0) break; 
+                planDate.setDate(planDate.getDate() + 1); 
+                dayCounter++; 
+            } 
+        }
+
+        function renderDashboard() { 
+            const todayEntry = getTodayEntry(); 
+            if (todayEntry) { 
+                targetCountEl.textContent = todayEntry.target; 
+                smokedCountEl.textContent = todayEntry.smoked; 
+                const { smoked, target } = todayEntry; 
+                smokedCountEl.classList.remove('text-green-500', 'text-amber-500', 'text-red-500', 'text-slate-800'); 
+                if (smoked <= target) {
+                    smokedCountEl.classList.add('text-slate-800');
+                } else {
+                    smokedCountEl.classList.add('text-red-500');
+                }
+                if (smoked >= target) { 
+                    smokedButton.classList.add('hidden'); 
+                    limitReachedControls.classList.remove('hidden'); 
+                    limitReachedButton.innerHTML = (translations[state.language] && translations[state.language].limitReachedText) || ''; 
+                    startCountdown(); 
+                } else { 
+                    smokedButton.classList.remove('hidden'); 
+                    limitReachedControls.classList.add('hidden'); 
+                    stopCountdown(); 
+                } 
+            } else { 
+                targetCountEl.textContent = '0'; 
+                smokedCountEl.textContent = '0'; 
+                smokedButton.classList.add('hidden'); 
+            } 
+        }
+
+        function showSosScreen() { sosScreen.classList.remove('hidden'); sosScreen.classList.add('flex'); showSosView('menu'); }
+        
+        function hideSosScreen() { 
+            sosScreen.classList.add('hidden'); 
+            sosScreen.classList.remove('flex'); 
+            stopBreathingExercise(); 
+        }
+        function handleSosChoice(choice) { showSosView(choice); }
+        
+        function showNextMotivation() {
+            const quotes = translations[state.language]?.motivationQuotes;
+            if (!quotes) return;
+            let randomIndex;
+            do { randomIndex = Math.floor(Math.random() * quotes.length); } while (quotes.length > 1 && randomIndex === lastMotivationQuoteIndex);
+            lastMotivationQuoteIndex = randomIndex;
+            motivationQuoteText.textContent = `"${quotes[randomIndex]}"`;
+        }
+
+        function showSosView(viewName) {
+            sosMenu.classList.add('hidden');
+            sosBreathingView.classList.add('hidden');
+            sosMotivationView.classList.add('hidden');
+
+            if(breathingIntervals.length > 0) stopBreathingExercise();
+
+            if (viewName === 'menu') {
+                sosMenu.classList.remove('hidden');
+            } else if (viewName === 'breathing') {
+                sosBreathingView.classList.remove('hidden');
+                startBreathingExercise();
+            } else if (viewName === 'motivation') { 
+                sosMotivationView.classList.remove('hidden');
+                showNextMotivation();
             }
         }
         
-        function updateUIForLanguage() {
-            languageSwitcher.textContent = state.language === 'en' ? 'தமிழ்' : 'English';
-            document.querySelectorAll('[data-translate]').forEach(el => {
-                const key = el.getAttribute('data-translate');
-                if (translations[state.language][key]) {
-                    el.textContent = translations[state.language][key];
+        function startBreathingExercise() {
+            breathingAnimationView.classList.remove('hidden');
+            breathingCompleteView.classList.add('hidden');
+            const phases = [ { text: "Breathe In", scale: 1.2, glowScale: 1.5, duration: 4000 }, { text: "Hold", scale: 1.2, glowScale: 1.5, duration: 4000 }, { text: "Breathe Out", scale: 1, glowScale: 1, duration: 6000 } ];
+            let currentPhase = -1;
+            let mainTimer = 120;
+            breathingMainTimerEl.textContent = mainTimer;
+
+            function nextPhase() {
+                currentPhase = (currentPhase + 1) % phases.length;
+                const phase = phases[currentPhase];
+                breathingText.textContent = phase.text;
+                breathingCircle.style.transform = `scale(${phase.scale})`;
+                breathingGlow.style.transform = `scale(${phase.glowScale})`;
+                breathingPhaseTimerEl.textContent = phase.duration / 1000;
+                let timer = phase.duration / 1000;
+                const timerInterval = setInterval(() => {
+                    timer--;
+                    breathingPhaseTimerEl.textContent = timer;
+                    if(timer <= 0) clearInterval(timerInterval);
+                }, 1000);
+                breathingIntervals.push(timerInterval);
+                const phaseTimer = setTimeout(nextPhase, phase.duration);
+                breathingIntervals.push(phaseTimer);
+            }
+            
+            const mainTimerInterval = setInterval(() => {
+                mainTimer--;
+                breathingMainTimerEl.textContent = mainTimer;
+                if(mainTimer <= 0) clearInterval(mainTimerInterval);
+            }, 1000);
+            breathingIntervals.push(mainTimerInterval);
+            nextPhase();
+            const mainTimeout = setTimeout(() => stopBreathingExercise(true), 120000); 
+            breathingIntervals.push(mainTimeout);
+        }
+        
+        function stopBreathingExercise(isComplete = false) {
+            breathingIntervals.forEach(id => { clearTimeout(id); clearInterval(id); });
+            breathingIntervals = [];
+            breathingText.textContent = "Start";
+            breathingCircle.style.transform = "scale(1)";
+            breathingGlow.style.transform = "scale(1)";
+            if (isComplete) {
+                breathingAnimationView.classList.add('hidden');
+                breathingCompleteView.classList.remove('hidden');
+            }
+        }
+
+        function getCurrentDate() { return mockDate || new Date(); }
+        function getTodayEntry() { return state.plan ? state.plan.find(day => day.date === toISODateString(getCurrentDate())) : null; }
+        function toISODateString(date) { const year = date.getFullYear(); const month = String(date.getMonth() + 1).padStart(2, '0'); const day = String(date.getDate()).padStart(2, '0'); return `${year}-${month}-${day}`; }
+        function formatDate(dateString) { const date = new Date(dateString); const options = { month: 'short', day: 'numeric', timeZone: 'UTC' }; return date.toLocaleDateString(state.language === 'ta' ? 'ta-IN' : 'en-US', options); }
+        
+        function resetJourney() { 
+            closeModal('confirm-modal');
+            localStorage.removeItem('smokeFreeJourneyState'); 
+            localStorage.removeItem('smokeFreeMockDate');
+            mockDate = null;
+            state = {}; 
+            init(); 
+        }
+
+        function showConfirmModal(type) { 
+            const confirmTitle = document.getElementById('confirm-modal-title');
+            const confirmText = document.getElementById('confirm-modal-text');
+            if (type === 'startOver') { 
+                confirmTitle.textContent = (translations[state.language] && translations[state.language].confirmStartOverTitle) || "Start Over?"; 
+                confirmText.textContent = (translations[state.language] && translations[state.language].confirmStartOverText) || "All your progress will be lost."; 
+            } 
+            confirmModal.classList.remove('hidden'); 
+            confirmModal.querySelector('.modal-content').classList.add('scale-100'); 
+        }
+        function closeModal(modalId) { const modal = document.getElementById(modalId); modal.querySelector('.modal-content').classList.remove('scale-100'); modal.classList.add('hidden'); }
+        function saveState() { localStorage.setItem('smokeFreeJourneyState', JSON.stringify(state)); }
+        function loadState() { 
+            const savedState = localStorage.getItem('smokeFreeJourneyState'); 
+            if (savedState) { state = JSON.parse(savedState); } 
+            else { state = { language: 'en', plan: [], startDate: null, initialCount: 0, lastCheckedDate: null }; } 
+            const savedMockDate = localStorage.getItem('smokeFreeMockDate');
+            if (savedMockDate) { mockDate = new Date(savedMockDate); }
+        }
+        function render() { renderDashboard(); renderTable(); }
+        
+        function renderTable() { 
+            progressTableBody.innerHTML = ''; 
+            const todayStr = toISODateString(getCurrentDate()); 
+            if (!state.plan) return; 
+            state.plan.forEach(day => { 
+                const isToday = day.date === todayStr; 
+                const rowClass = isToday ? 'bg-slate-100 font-semibold' : ''; 
+                let statusClass = ''; 
+                let statusText = 'Pending'; 
+                if (day.status === 'Pass') { 
+                    statusClass = 'text-green-500'; statusText = 'Pass'; 
+                } else if (day.status === 'Fail') { 
+                    statusClass = 'text-red-500'; statusText = 'Fail'; 
+                } else if (day.status === 'Waiting') { 
+                    statusClass = 'text-amber-500'; statusText = 'Wait'; 
+                } else if (day.status === 'Over') {
+                    statusClass = 'text-blue-500'; statusText = 'Over';
+                }
+
+                const progress = state.initialCount > 0 ? Math.round(((state.initialCount - day.target) / state.initialCount) * 100) : (day.target === 0 ? 100 : 0);
+
+                const row = `<tr class="${rowClass}">
+                    <td class="py-3 px-2">${formatDate(day.date)}</td>
+                    <td class="py-3 px-2 text-center">${day.target}</td>
+                    <td class="py-3 px-2 text-center">${day.smoked}</td>
+                    <td class="py-3 px-2 text-center font-semibold ${statusClass}">${statusText}</td>
+                    <td class="py-3 px-2 text-center">${progress}%</td>
+                </tr>`; 
+                progressTableBody.insertAdjacentHTML('beforeend', row); 
+            }); 
+        }
+
+        function startCountdown() { 
+            if (countdownInterval) clearInterval(countdownInterval); 
+            countdownInterval = setInterval(() => { 
+                const now = getCurrentDate(); 
+                const midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 0); 
+                const diff = midnight - now; 
+                if (diff <= 1000) { 
+                    stopCountdown(); 
+                    if (mockDate) { localStorage.removeItem('smokeFreeMockDate'); }
+                    setTimeout(() => location.reload(), 1000); 
+                    return; 
+                } 
+                const hours = String(Math.floor((diff / (1000 * 60 * 60)) % 24)).padStart(2, '0'); 
+                const minutes = String(Math.floor((diff / 1000 / 60) % 60)).padStart(2, '0'); 
+                const seconds = String(Math.floor((diff / 1000) % 60)).padStart(2, '0'); 
+                const countdownSpan = document.getElementById('countdown-timer'); 
+                if (countdownSpan) { 
+                    countdownSpan.textContent = `${hours}:${minutes}:${seconds}`; 
+                } 
+            }, 1000); 
+        }
+
+        function stopCountdown() { if (countdownInterval) { clearInterval(countdownInterval); countdownInterval = null; } }
+        
+        function updateUIForLanguage() { 
+            languageSwitcher.textContent = state.language === 'en' ? 'தமிழ்' : 'English'; 
+            document.querySelectorAll('[data-translate]').forEach(el => { 
+                const key = el.getAttribute('data-translate'); 
+                if (translations[state.language] && translations[state.language][key]) { 
+                    el.innerHTML = translations[state.language][key]; 
+                } 
+            }); 
+        }
+        
+        function checkDailyStatus() {
+            const todayStr = toISODateString(getCurrentDate());
+            if(!state.plan || !state.lastCheckedDate || state.lastCheckedDate === todayStr) return;
+            state.plan.forEach(day => {
+                if (day.date < todayStr && (day.status === 'Pending' || day.status === 'Waiting' || day.status === 'Over')) {
+                    day.status = day.smoked <= day.target ? 'Pass' : 'Fail';
                 }
             });
-            runningMessageEl.textContent = translations[state.language].runningMessage;
+            state.lastCheckedDate = todayStr;
+            saveState();
+            renderTable();
+        }
+        
+        function handleSmokedClick() {
+            const todayEntry = getTodayEntry();
+            if (todayEntry) {
+                todayEntry.smoked += 1;
+                
+                if (todayEntry.smoked === todayEntry.target) {
+                    todayEntry.status = 'Over';
+                } else if (todayEntry.smoked > todayEntry.target) {
+                    todayEntry.status = 'Waiting';
+                }
+
+                saveState();
+                render();
+            }
         }
 
         function startJourney(e) {
@@ -327,263 +607,35 @@
             const count = parseInt(initialCigarettesInput.value);
             if (count > 0) {
                 state.initialCount = count;
-                state.startDate = getTodayDateString();
-                state.lastCheckedDate = getYesterdayDateString(); 
+                state.startDate = toISODateString(getCurrentDate());
+                state.lastCheckedDate = toISODateString(new Date(getCurrentDate().setDate(getCurrentDate().getDate()-1)));
                 generatePlan();
                 saveState();
                 showScreen('main');
                 render();
             }
         }
-
-        function generatePlan() {
-            state.plan = [];
-            let currentDate = new Date();
-            let weekCounter = 0;
-            
-            while(true) {
-                const weekNumber = Math.floor(weekCounter / 7);
-                const dailyTarget = Math.max(0, state.initialCount - 1 - weekNumber);
-                
-                state.plan.push({
-                    date: toISODateString(currentDate),
-                    target: dailyTarget,
-                    smoked: 0,
-                    status: 'Pending'
-                });
-
-                if (dailyTarget === 0) break;
-
-                currentDate.setDate(currentDate.getDate() + 1);
-                weekCounter++;
-            }
-        }
-
-        function handleSmokedClick() {
-            const todayEntry = getTodayEntry();
-            if (todayEntry && todayEntry.smoked < todayEntry.target) {
-                todayEntry.smoked += 1;
-                if (todayEntry.smoked >= todayEntry.target) {
-                    todayEntry.status = 'Waiting';
-                }
-                saveState();
-                render();
-            }
-        }
-
-        function render() {
-            renderDashboard();
-            renderTable();
-        }
-
-        function renderDashboard() {
-            const todayEntry = getTodayEntry();
-            if (todayEntry) {
-                targetCountEl.textContent = todayEntry.target;
-                smokedCountEl.textContent = todayEntry.smoked;
-
-                const { smoked, target } = todayEntry;
-                smokedCountEl.classList.remove('text-green-400', 'text-amber-400', 'text-red-400');
-                if (target > 0) {
-                    if (smoked <= target / 3) {
-                        smokedCountEl.classList.add('text-green-400');
-                    } else if (smoked <= (target * 2) / 3) {
-                        smokedCountEl.classList.add('text-amber-400');
-                    } else {
-                        smokedCountEl.classList.add('text-red-400');
-                    }
-                } else {
-                     smokedCountEl.classList.add('text-green-400');
-                }
-                
-                if (smoked >= target) {
-                    smokedButton.classList.add('hidden');
-                    limitReachedControls.classList.remove('hidden');
-                    limitReachedButton.innerHTML = translations[state.language].limitReachedText;
-                    startCountdown();
-                } else {
-                    smokedButton.classList.remove('hidden');
-                    limitReachedControls.classList.add('hidden');
-                    stopCountdown();
-                }
-            } else {
-                targetCountEl.textContent = '0';
-                smokedCountEl.textContent = '0';
-                smokedButton.classList.add('hidden');
-            }
-        }
         
-        function renderTable() {
-            progressTableBody.innerHTML = '';
-            const todayStr = getTodayDateString();
-            state.plan.forEach(day => {
-                const isToday = day.date === todayStr;
-                const rowClass = isToday ? 'bg-slate-700/50 font-semibold' : '';
-                
-                let statusClass = '';
-                let statusText = translations[state.language].statusPending;
-                
-                if (day.status === 'Pass') {
-                    statusClass = 'text-green-400';
-                    statusText = translations[state.language].statusPass;
-                } else if (day.status === 'Fail') {
-                    statusClass = 'text-red-400';
-                    statusText = translations[state.language].statusFail;
-                } else if (day.status === 'Waiting') {
-                    statusClass = 'text-amber-400';
-                    statusText = translations[state.language].statusWaiting;
-                }
-
-                const row = `
-                    <tr class="${rowClass}">
-                        <td class="py-3 px-2">${formatDate(day.date)}</td>
-                        <td class="py-3 px-2 text-center">${day.target}</td>
-                        <td class="py-3 px-2 text-center">${day.smoked}</td>
-                        <td class="py-3 px-2 text-center font-semibold ${statusClass}">${statusText}</td>
-                    </tr>
-                `;
-                progressTableBody.insertAdjacentHTML('beforeend', row);
-            });
-        }
-        
-        function checkDailyStatus() {
-            const todayStr = getTodayDateString();
-            if(state.lastCheckedDate === todayStr) return;
-            
-            let showMotivation = false;
-            
-            state.plan.forEach(day => {
-                if (day.date < todayStr && (day.status === 'Pending' || day.status === 'Waiting')) {
-                    day.status = day.smoked <= day.target ? 'Pass' : 'Fail';
-                    if (day.date === getYesterdayDateString() && day.status === 'Pass') {
-                        showMotivation = true;
-                    }
-                }
-            });
-
-            if (showMotivation) {
-                showMotivationModal();
-            }
-
-            state.lastCheckedDate = todayStr;
+        function toggleLanguage() {
+            state.language = state.language === 'en' ? 'ta' : 'en';
             saveState();
-            renderTable();
-        }
-
-        function startCountdown() {
-            if (countdownInterval) clearInterval(countdownInterval);
-
-            countdownInterval = setInterval(() => {
-                const now = new Date();
-                const midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 0);
-                const diff = midnight - now;
-
-                if (diff <= 0) {
-                    stopCountdown();
-                    location.reload();
-                    return;
-                }
-
-                const hours = String(Math.floor((diff / (1000 * 60 * 60)) % 24)).padStart(2, '0');
-                const minutes = String(Math.floor((diff / 1000 / 60) % 60)).padStart(2, '0');
-                const seconds = String(Math.floor((diff / 1000) % 60)).padStart(2, '0');
-                
-                const countdownSpan = document.getElementById('countdown-timer');
-                if (countdownSpan) {
-                    countdownSpan.textContent = `${hours}:${minutes}:${seconds}`;
-                }
-            }, 1000);
-        }
-        
-        function stopCountdown() {
-            if (countdownInterval) {
-                clearInterval(countdownInterval);
-                countdownInterval = null;
+            updateUIForLanguage();
+            if (state.plan && state.plan.length > 0) {
+                render(); 
             }
         }
 
-        // --- View & Modal Controls ---
-        function showScreen(screenName) {
-            setupScreen.classList.add('hidden');
-            mainScreen.classList.add('hidden');
-            congratsScreen.classList.add('hidden');
-
-            if(screenName === 'setup') setupScreen.classList.remove('hidden');
-            if(screenName === 'main') mainScreen.classList.remove('hidden');
-            if(screenName === 'congrats') congratsScreen.classList.remove('hidden');
-        }
-        
-        function showMotivationModal() {
-            const langQuotes = quotes[state.language];
-            const randomQuote = langQuotes[Math.floor(Math.random() * langQuotes.length)];
-            motivationQuoteEl.textContent = `"${randomQuote}"`;
-            motivationModal.classList.remove('hidden');
-            motivationModal.querySelector('.modal-content').classList.add('scale-100');
-        }
-
-        function showUrgeModal() {
-            const urgeTips = translations[state.language].urgeTips;
-            let randomIndex;
-            
-            do {
-                randomIndex = Math.floor(Math.random() * urgeTips.length);
-            } while (urgeTips.length > 1 && randomIndex === lastUrgeTipIndex);
-
-            lastUrgeTipIndex = randomIndex;
-            const randomTip = urgeTips[randomIndex];
-
-            urgeQuoteEl.textContent = randomTip;
-            urgeModal.classList.remove('hidden');
-            urgeModal.querySelector('.modal-content').classList.add('scale-100');
-        }
-
-        function closeModal(modalId) {
-            const modal = document.getElementById(modalId);
-            modal.querySelector('.modal-content').classList.remove('scale-100');
-            modal.classList.add('hidden');
-        }
-
-        // --- Local Storage ---
-        function saveState() {
-            localStorage.setItem('smokeFreeState', JSON.stringify(state));
-        }
-
-        function loadState() {
-            const savedState = localStorage.getItem('smokeFreeState');
-            if (savedState) {
-                state = JSON.parse(savedState);
+        function advanceDay() {
+            if (!mockDate) {
+                mockDate = new Date();
             }
+            mockDate.setDate(mockDate.getDate() + 1);
+            localStorage.setItem('smokeFreeMockDate', mockDate.toISOString());
+            location.reload();
         }
 
-        // --- Date Helpers ---
-        function getTodayEntry() {
-            return state.plan.find(day => day.date === getTodayDateString());
-        }
-        
-        function getTodayDateString() {
-            return toISODateString(new Date());
-        }
-        
-        function getYesterdayDateString() {
-            const yesterday = new Date();
-            yesterday.setDate(yesterday.getDate() - 1);
-            return toISODateString(yesterday);
-        }
-
-        function toISODateString(date) {
-            return date.toISOString().split('T')[0];
-        }
-
-        function formatDate(dateString) {
-            const date = new Date(dateString);
-            const options = { month: 'short', day: 'numeric' };
-            return date.toLocaleDateString(state.language === 'ta' ? 'ta-IN' : 'en-US', options);
-        }
-        
-        // --- Start the App ---
         init();
     </script>
 </body>
 </html>
-
 
