@@ -162,7 +162,7 @@
                 <div class="space-y-4">
                     <button data-sos="breathing" class="w-full bg-white hover:bg-slate-50 border border-slate-200 text-slate-800 font-bold py-4 rounded-lg text-lg" data-translate="sosBreathing">Breathing Exercise</button>
                     <button data-sos="motivation" class="w-full bg-white hover:bg-slate-50 border border-slate-200 text-slate-800 font-bold py-4 rounded-lg text-lg" data-translate="sosMotivation">Get Motivation</button>
-                    <a href="Game/index.html" class="block">
+                    <a href="game/index.html" class="block">
                         <button class="w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:opacity-90 text-white font-bold py-4 rounded-lg text-lg" data-translate="sosGame">Play a Game</button>
                     </a>
                 </div>
@@ -278,10 +278,6 @@
                 congratsQuote: "\"Don't compromise on a single cigarette. The journey was long, but your freedom is worth it. Stay vigilant, stay strong.\"",
                 confirmStartOverTitle: "Are you sure you want to start over?",
                 confirmStartOverText: "This is a long and challenging process. Starting again means losing all your hard-earned progress. Don't give up on your freedom so easily!",
-<<<<<<< HEAD
-=======
-                // ADDED: New translation for the progress header
->>>>>>> dc7c73d0c1f1bb95b94df75497ad7bc00aaac79e
                 progressHeader: "Progress"
              },
             ta: {
@@ -501,13 +497,28 @@
         }
         function closeModal(modalId) { const modal = document.getElementById(modalId); modal.querySelector('.modal-content').classList.remove('scale-100'); modal.classList.add('hidden'); }
         function saveState() { localStorage.setItem('smokeFreeJourneyState', JSON.stringify(state)); }
-        function loadState() { 
-            const savedState = localStorage.getItem('smokeFreeJourneyState'); 
-            if (savedState) { state = JSON.parse(savedState); } 
-            else { state = { language: 'en', plan: [], startDate: null, initialCount: 0, lastCheckedDate: null }; } 
+        
+        function loadState() {
+            let loadedState = {};
+            const savedState = localStorage.getItem('smokeFreeJourneyState');
+            if (savedState) {
+                try {
+                    loadedState = JSON.parse(savedState);
+                } catch (e) {
+                    console.error("Failed to parse state from localStorage, starting fresh.", e);
+                    loadedState = {};
+                }
+            }
+            
+            const defaultState = { language: 'en', plan: [], startDate: null, initialCount: 0, lastCheckedDate: null };
+            state = { ...defaultState, ...loadedState };
+
             const savedMockDate = localStorage.getItem('smokeFreeMockDate');
-            if (savedMockDate) { mockDate = new Date(savedMockDate); }
+            if (savedMockDate) {
+                mockDate = new Date(savedMockDate);
+            }
         }
+
         function render() { renderDashboard(); renderTable(); }
         
         function renderTable() { 
