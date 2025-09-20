@@ -124,12 +124,7 @@ define("scripts/control.js", function(exports){
 	    var dragger = new Ucren.BasicDrag({ type: "calc" });
 	
 	    dragger.on("returnValue", function( dx, dy, x, y, kf ){
-            // NEW: Calculate correct knife position based on scaling and offset
-            var scale = window.gameScale || 1;
-	    	var correctedX = (x - canvasLeft) / scale;
-	    	var correctedY = (y - canvasTop) / scale;
-
-	    	if( kf = knife.through( correctedX, correctedY ) )
+	    	if( kf = knife.through( x - canvasLeft, y - canvasTop ) )
 	            message.postMessage( kf, "slice" );
 	    });
 	
@@ -148,40 +143,17 @@ define("scripts/control.js", function(exports){
 	};
 	
 	exports.fixCanvasPos = function(){
-        // This function is now our main resize handler
-        window.addEventListener("resize", resizeGame);
-        resizeGame(); // Initial resize
-	};
-
-    // Add this new helper function right below the one you just replaced
-    function resizeGame() {
-        const gameContainer = document.getElementById('game-container');
-        const gameWrapper = document.getElementById('game-wrapper');
-        const containerWidth = gameContainer.clientWidth;
-        const containerHeight = gameContainer.clientHeight;
-        const gameAspectRatio = 640 / 480;
-        let scale = 1;
-
-        if (containerWidth / containerHeight > gameAspectRatio) {
-            scale = containerHeight / 480;
-        } else {
-            scale = containerWidth / 640;
-        }
-
-        const newWidth = 640 * scale;
-        const newHeight = 480 * scale;
-
-        gameWrapper.style.transform = `scale(${scale})`;
-
-        // These global variables are used by the knife/slicing logic
-        canvasLeft = (containerWidth - newWidth) / 2;
-        canvasTop = (containerHeight - newHeight) / 2;
-        gameWrapper.style.left = `${canvasLeft}px`;
-        gameWrapper.style.top = `${canvasTop}px`;
-        
-        // Expose scale globally for the dragger to use
-        window.gameScale = scale;
-    };
+		var de = document.documentElement;
+	
+		var fix = function(e){
+		    canvasLeft = (de.clientWidth - 640) / 2;
+		    canvasTop = (de.clientHeight - 480) / 2 - 40;
+		};
+	
+		fix();
+	
+		Ucren.addEvent(window, "resize", fix);
+	};;
 
 	return exports;
 });
