@@ -28,29 +28,45 @@
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
         /* Breathing Animation */
-        #breathing-circle-container {
-            position: relative;
-            width: 200px;
-            height: 200px;
-        }
-        #breathing-glow {
-            position: absolute;
+        #sos-breathing-view.active {
+            position: fixed;
             inset: 0;
-            background: radial-gradient(circle, rgba(34, 211, 238, 0.3) 0%, rgba(34, 211, 238, 0) 70%);
-            border-radius: 50%;
-            transition: transform 4s cubic-bezier(0.4, 0, 0.2, 1);
+            background: linear-gradient(160deg, #0f172a 0%, #1e293b 100%);
+            z-index: 100;
         }
-        #breathing-circle {
+        #breathing-guide {
+            width: 250px;
+            height: 250px;
             position: relative;
-            width: 100%;
-            height: 100%;
-            background-color: #06b6d4; /* cyan-500 */
-            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: transform 4s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 0 30px rgba(34, 211, 238, 0.4);
+        }
+        #breathing-outer-ring {
+            position: absolute;
+            inset: 0;
+            border: 2px solid rgba(6, 182, 212, 0.2);
+            border-radius: 50%;
+            transition: transform 4s ease-in-out;
+        }
+        #breathing-inner-circle {
+            width: 75%;
+            height: 75%;
+            background: radial-gradient(circle, #0e7490, #164e63);
+            border-radius: 50%;
+            box-shadow: 0 0 40px rgba(6, 182, 212, 0.5);
+            transition: transform 4s ease-in-out;
+        }
+        #breathing-instruction {
+            position: absolute;
+            color: white;
+            font-size: 2rem;
+            font-weight: 600;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+        }
+        #breathing-instruction.visible {
+            opacity: 1;
         }
     </style>
 </head>
@@ -152,6 +168,16 @@
         </div>
     </div>
 
+    <!-- NEW: Appreciation Modal -->
+    <div id="appreciation-modal" class="fixed inset-0 bg-black bg-opacity-75 backdrop-blur-sm flex items-center justify-center p-4 hidden modal-overlay">
+        <div class="bg-white rounded-2xl p-6 w-full max-w-sm mx-auto text-center modal-content transform scale-95 shadow-2xl border border-slate-200">
+            <div class="text-5xl mb-4">🎉</div>
+            <h3 id="appreciation-modal-title" class="text-2xl font-bold mb-2 text-green-500">Great Job!</h3>
+            <p id="appreciation-modal-text" class="text-slate-600 mb-6"></p>
+            <button id="appreciation-close-button" class="w-full bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-2 px-4 rounded-lg">Close</button>
+        </div>
+    </div>
+
     <!-- SOS Screen -->
     <div id="sos-screen" class="fixed inset-0 bg-slate-100 p-4 hidden sos-overlay flex-col justify-center items-center">
         <div class="w-full h-full text-center sos-content flex flex-col items-center justify-center">
@@ -162,7 +188,6 @@
                 <div class="space-y-4">
                     <button data-sos="breathing" class="w-full bg-white hover:bg-slate-50 border border-slate-200 text-slate-800 font-bold py-4 rounded-lg text-lg" data-translate="sosBreathing">Breathing Exercise</button>
                     <button data-sos="motivation" class="w-full bg-white hover:bg-slate-50 border border-slate-200 text-slate-800 font-bold py-4 rounded-lg text-lg" data-translate="sosMotivation">Get Motivation</button>
-                    <!-- FIXED: Changed href to match the case-sensitive folder name on GitHub -->
                     <a href="Game/index.html" class="block">
                         <button class="w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:opacity-90 text-white font-bold py-4 rounded-lg text-lg" data-translate="sosGame">Play a Game</button>
                     </a>
@@ -171,24 +196,21 @@
             </div>
             
             <!-- Breathing Exercise -->
-            <div id="sos-breathing-view" class="hidden flex flex-col items-center justify-center">
-                 <h3 class="text-2xl font-bold mb-4" data-translate="breathingTitle">Follow the Guide</h3>
-                 <div id="breathing-animation-view" class="flex flex-col items-center">
-                    <div id="breathing-circle-container" class="mx-auto flex items-center justify-center">
-                        <div id="breathing-glow"></div>
-                        <div id="breathing-circle">
-                            <p id="breathing-text" class="text-3xl font-bold text-white transition-opacity duration-500">Start</p>
-                        </div>
+            <div id="sos-breathing-view" class="hidden flex-col items-center justify-center">
+                <div id="breathing-animation-view" class="w-full h-full flex flex-col items-center justify-center">
+                    <div id="breathing-guide">
+                        <div id="breathing-outer-ring"></div>
+                        <div id="breathing-inner-circle"></div>
+                        <p id="breathing-instruction"></p>
                     </div>
-                    <p id="breathing-phase-timer" class="text-4xl font-mono mt-4 text-slate-700">4</p>
-                    <p class="text-xl mt-2 text-slate-600">Overall Time: <span id="breathing-main-timer">120</span>s</p>
-                    <button id="breathing-back-button" class="mt-6 bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold py-2 px-6 rounded-full text-sm" data-translate="backButton">Back to Menu</button>
-                 </div>
-                 <div id="breathing-complete-view" class="hidden">
-                     <p class="text-2xl text-green-500 font-bold mb-4" data-translate="breathingCompleteTitle">Well Done!</p>
-                     <p class="text-slate-600" data-translate="breathingCompleteText">You took control. The craving has less power now. Keep going!</p>
-                     <button id="breathing-done-button" class="mt-8 bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold py-2 px-6 rounded-full" data-translate="feelBetterButton">I Feel Better</button>
-                 </div>
+                    <p class="absolute top-5 text-xl text-slate-400">Total Time: <span id="breathing-main-timer">120</span>s</p>
+                    <button id="breathing-back-button" class="absolute bottom-10 bg-white/10 hover:bg-white/20 text-white font-bold py-2 px-6 rounded-full text-sm backdrop-blur-sm" data-translate="backButton">Back to Menu</button>
+                </div>
+                <div id="breathing-complete-view" class="hidden w-full h-full flex-col items-center justify-center text-center p-4">
+                     <p class="text-3xl text-green-400 font-bold mb-4" data-translate="breathingCompleteTitle">Well Done!</p>
+                     <p class="text-slate-400 text-lg" data-translate="breathingCompleteText">You took control. The craving has less power now. Keep going!</p>
+                     <button id="breathing-done-button" class="mt-8 bg-white/10 hover:bg-white/20 text-white font-bold py-3 px-8 rounded-full" data-translate="feelBetterButton">I Feel Better</button>
+                </div>
             </div>
 
              <!-- Motivation -->
@@ -229,15 +251,11 @@
         const sosBreathingView = document.getElementById('sos-breathing-view');
         const sosMotivationView = document.getElementById('sos-motivation-view');
         const sosCloseButton = document.getElementById('sos-close-button');
-        const breathingCircle = document.getElementById('breathing-circle');
-        const breathingGlow = document.getElementById('breathing-glow');
-        const breathingText = document.getElementById('breathing-text');
-        const breathingPhaseTimerEl = document.getElementById('breathing-phase-timer');
-        const breathingMainTimerEl = document.getElementById('breathing-main-timer');
         const breathingAnimationView = document.getElementById('breathing-animation-view');
         const breathingCompleteView = document.getElementById('breathing-complete-view');
         const motivationQuoteText = document.getElementById('motivation-quote-text');
         const nextDayButton = document.getElementById('next-day-button');
+        const appreciationModal = document.getElementById('appreciation-modal');
 
         // --- App State ---
         let state = {}; 
@@ -275,14 +293,73 @@
                     "You are not a smoker trying to quit. You are a non-smoker learning to live without cigarettes. Embrace your new identity.",
                     "Think of this craving as a wave. It feels huge right now, but it will pass. Just ride it out without giving in."
                 ],
+                appreciationMessages: [
+                    "Another day conquered! Your strength is inspiring.",
+                    "You did it! Every smoke-free day is a massive win for your health.",
+                    "Fantastic work yesterday! Keep building on this momentum.",
+                    "Success! You're proving to yourself how powerful you are.",
+                    "Well done! You're one day closer to a completely smoke-free life."
+                ],
                 congratsTitle: "You Made It!",
                 congratsQuote: "\"Don't compromise on a single cigarette. The journey was long, but your freedom is worth it. Stay vigilant, stay strong.\"",
                 confirmStartOverTitle: "Are you sure you want to start over?",
                 confirmStartOverText: "This is a long and challenging process. Starting again means losing all your hard-earned progress. Don't give up on your freedom so easily!",
-                progressHeader: "Progress"
+                progressHeader: "Progress",
+                welcomeTitle: "Welcome!",
+                welcomeSubtitle: "Let's start your journey to a smoke-free life.",
+                initialCigarettesLabel: "How many cigarettes do you smoke per day?",
+                startButton: "Start Journey",
+                todaysTarget: "Today's Target",
+                smokedToday: "Smoked Today",
+                smokedButton: "I Smoked a Cigarette",
+                progressLogTitle: "Progress Log",
+                dateHeader: "Date",
+                targetHeader: "Target",
+                smokedHeader: "Smoked",
+                statusHeader: "Status",
              },
             ta: {
-                // Tamil translations would go here
+                appTitle: "புகை-இல்லா பயணம்",
+                startOverButton: "புதிதாகத் தொடங்கு",
+                urgeButton: "ஒரு ஆசை இருந்தது?",
+                sosTitle: "அவசர உதவி",
+                sosSubtitle: "இந்த ஆசையை விட நீங்கள் வலிமையானவர். கீழே ஒரு விருப்பத்தைத் தேர்ந்தெடுக்கவும்.",
+                sosBreathing: "சுவாசப் பயிற்சி",
+                sosMotivation: "உந்துதல் பெறுங்கள்",
+                sosGame: "விளையாடு",
+                sosClose: "நான் இப்போது நலமாக உள்ளேன், இதை மூடு.",
+                breathingTitle: "வழிகாட்டியைப் பின்பற்றவும்",
+                motivationTitle: "ஒரு சக்திவாய்ந்த நினைவூட்டல்",
+                backButton: "முக்கிய மெனுவிற்குத் திரும்பு",
+                feelBetterButton: "நான் நன்றாக உணர்கிறேன்",
+                breathingCompleteTitle: "நன்றாக செய்தீர்கள்!",
+                breathingCompleteText: "நீங்கள் கட்டுப்பாட்டை எடுத்துள்ளீர்கள். இப்போது ஆசைக்கு அதிக சக்தி இல்லை. தொடர்ந்து செல்லுங்கள்!",
+                runningMessage: "ஒரு காகிதம் மற்றும் இலைகளின் குச்சிக்கு அடிமையாக இருக்க வேண்டாம். நீங்கள் வெல்லும் ஒவ்வொரு ஆசையுடனும் சங்கிலிகளை உடைக்கவும்.",
+                limitReachedText: "அடுத்து <span id='countdown-timer' class='text-slate-800'>--:--:--</span>",
+                appreciationMessages: [
+                    "இன்னொரு நாள் வெற்றி! உங்கள் வலிமை ஊக்கமளிக்கிறது.",
+                    "நீங்கள் செய்தீர்கள்! ஒவ்வொரு புகைப்பிடிக்காத நாளும் உங்கள் ஆரோக்கியத்திற்கு ஒரு பெரிய வெற்றி.",
+                    "நேற்றைய அருமையான வேலை! இந்த வேகத்தில் தொடர்ந்து முன்னேறுங்கள்.",
+                    "வெற்றி! நீங்கள் எவ்வளவு சக்திவாய்ந்தவர் என்பதை நீங்களே நிரூபிக்கிறீர்கள்.",
+                    "நன்றாக செய்தீர்கள்! நீங்கள் முழுமையாக புகைப்பிடிக்காத வாழ்க்கைக்கு ஒரு நாள் நெருக்கமாக உள்ளீர்கள்."
+                ],
+                congratsTitle: "நீங்கள் சாதித்துவிட்டீர்கள்!",
+                congratsQuote: "\"ஒரே ஒரு சிகரெட்டில் சமரசம் செய்யாதீர்கள். பயணம் நீண்டது, ஆனால் உங்கள் சுதந்திரம் மதிப்புமிக்கது. விழிப்புடன் இருங்கள், வலிமையாக இருங்கள்.\"",
+                confirmStartOverTitle: "புதிதாகத் தொடங்க விரும்புகிறீர்களா?",
+                confirmStartOverText: "இது ஒரு நீண்ட மற்றும் சவாலான செயல்முறை. மீண்டும் தொடங்குவது என்பது உங்கள் கடினமாக சம்பாதித்த முன்னேற்றத்தை இழப்பதாகும். உங்கள் சுதந்திரத்தை எளிதில் விட்டுவிடாதீர்கள்!",
+                progressHeader: "முன்னேற்றம்",
+                welcomeTitle: "வாருங்கள்!",
+                welcomeSubtitle: "புகைப்பிடிக்காத வாழ்க்கையை நோக்கிய உங்கள் பயணத்தைத் தொடங்குவோம்.",
+                initialCigarettesLabel: "நீங்கள் ஒரு நாளைக்கு எத்தனை சிகரெட் புகைப்பீர்கள்?",
+                startButton: "பயணத்தைத் தொடங்கு",
+                todaysTarget: "இன்றைய இலக்கு",
+                smokedToday: "இன்று புகைத்தது",
+                smokedButton: "நான் ஒரு சிகரெட் புகைத்தேன்",
+                progressLogTitle: "முன்னேற்றப் பதிவேடு",
+                dateHeader: "தேதி",
+                targetHeader: "இலக்கு",
+                smokedHeader: "புகைத்தது",
+                statusHeader: "நிலை"
             }
         };
 
@@ -291,13 +368,14 @@
             loadState();
             updateUIForLanguage();
             if (state.plan && state.plan.length > 0) {
+                 checkDailyStatus(); // Check status first
+                 showAppreciationForYesterday(); // Then show appreciation if needed
                  const finalDay = state.plan[state.plan.length -1];
                  if(finalDay.target === 0 && finalDay.status === 'Pass'){
                      showScreen('congrats');
                  } else {
                      showScreen('main');
                      render();
-                     checkDailyStatus();
                  }
             } else {
                 showScreen('setup');
@@ -306,6 +384,7 @@
         }
         
         function showScreen(screenName) {
+            history.pushState({ screen: screenName }, '');
             setupScreen.classList.add('hidden');
             mainScreen.classList.add('hidden');
             congratsScreen.classList.add('hidden');
@@ -324,6 +403,7 @@
         }
 
         function setupEventListeners() {
+            window.addEventListener('popstate', handlePopState);
             setupForm.addEventListener('submit', startJourney);
             languageSwitcher.addEventListener('click', toggleLanguage);
             smokedButton.addEventListener('click', handleSmokedClick);
@@ -342,6 +422,7 @@
             document.getElementById('breathing-done-button').addEventListener('click', () => showSosView('menu'));
             document.getElementById('breathing-back-button').addEventListener('click', () => showSosView('menu'));
             document.getElementById('motivation-back-button').addEventListener('click', () => showSosView('menu'));
+            document.getElementById('appreciation-close-button').addEventListener('click', () => closeModal('appreciation-modal'));
         }
         
         function generatePlan() { 
@@ -387,9 +468,15 @@
             } 
         }
 
-        function showSosScreen() { sosScreen.classList.remove('hidden'); sosScreen.classList.add('flex'); showSosView('menu'); }
+        function showSosScreen() { 
+            history.pushState({ screen: 'sos' }, '');
+            sosScreen.classList.remove('hidden'); 
+            sosScreen.classList.add('flex'); 
+            showSosView('menu'); 
+        }
         
         function hideSosScreen() { 
+            history.pushState({ screen: 'main' }, '');
             sosScreen.classList.add('hidden'); 
             sosScreen.classList.remove('flex'); 
             stopBreathingExercise(); 
@@ -406,9 +493,13 @@
         }
 
         function showSosView(viewName) {
+            history.pushState({ screen: 'sos-' + viewName }, '');
             sosMenu.classList.add('hidden');
             sosBreathingView.classList.add('hidden');
             sosMotivationView.classList.add('hidden');
+
+            const breathingView = document.getElementById('sos-breathing-view');
+            breathingView.classList.remove('active');
 
             if(breathingIntervals.length > 0) stopBreathingExercise();
 
@@ -424,51 +515,70 @@
         }
         
         function startBreathingExercise() {
-            breathingAnimationView.classList.remove('hidden');
-            breathingCompleteView.classList.add('hidden');
-            const phases = [ { text: "Breathe In", scale: 1.2, glowScale: 1.5, duration: 4000 }, { text: "Hold", scale: 1.2, glowScale: 1.5, duration: 4000 }, { text: "Breathe Out", scale: 1, glowScale: 1, duration: 6000 } ];
+            const breathingView = document.getElementById('sos-breathing-view');
+            breathingView.classList.add('active'); // Activate dark theme
+
+            breathingAnimationView.style.display = 'flex';
+            breathingCompleteView.style.display = 'none';
+
+            const outerRing = document.getElementById('breathing-outer-ring');
+            const innerCircle = document.getElementById('breathing-inner-circle');
+            const instruction = document.getElementById('breathing-instruction');
+            const mainTimerEl = document.getElementById('breathing-main-timer');
+
+            const phases = [
+                { text: "Breathe In", scale: 1, duration: 4000 },
+                { text: "Hold", scale: 1, duration: 4000 },
+                { text: "Breathe Out", scale: 0.75, duration: 6000 }
+            ];
             let currentPhase = -1;
             let mainTimer = 120;
-            breathingMainTimerEl.textContent = mainTimer;
+            mainTimerEl.textContent = mainTimer;
 
             function nextPhase() {
-                currentPhase = (currentPhase + 1) % phases.length;
-                const phase = phases[currentPhase];
-                breathingText.textContent = phase.text;
-                breathingCircle.style.transform = `scale(${phase.scale})`;
-                breathingGlow.style.transform = `scale(${phase.glowScale})`;
-                breathingPhaseTimerEl.textContent = phase.duration / 1000;
-                let timer = phase.duration / 1000;
-                const timerInterval = setInterval(() => {
-                    timer--;
-                    breathingPhaseTimerEl.textContent = timer;
-                    if(timer <= 0) clearInterval(timerInterval);
-                }, 1000);
-                breathingIntervals.push(timerInterval);
-                const phaseTimer = setTimeout(nextPhase, phase.duration);
-                breathingIntervals.push(phaseTimer);
+                instruction.classList.remove('visible');
+
+                setTimeout(() => {
+                    currentPhase = (currentPhase + 1) % phases.length;
+                    const phase = phases[currentPhase];
+                    
+                    instruction.textContent = phase.text;
+                    instruction.classList.add('visible');
+                    
+                    outerRing.style.transform = `scale(${phase.scale})`;
+                    innerCircle.style.transform = `scale(${phase.scale})`;
+
+                    const phaseTimer = setTimeout(nextPhase, phase.duration);
+                    breathingIntervals.push(phaseTimer);
+                }, 1000); // 1s pause between phases
             }
             
             const mainTimerInterval = setInterval(() => {
                 mainTimer--;
-                breathingMainTimerEl.textContent = mainTimer;
+                mainTimerEl.textContent = mainTimer;
                 if(mainTimer <= 0) clearInterval(mainTimerInterval);
             }, 1000);
             breathingIntervals.push(mainTimerInterval);
+
             nextPhase();
-            const mainTimeout = setTimeout(() => stopBreathingExercise(true), 120000); 
+
+            const mainTimeout = setTimeout(() => {
+                stopBreathingExercise(true);
+            }, 120000); 
             breathingIntervals.push(mainTimeout);
         }
         
         function stopBreathingExercise(isComplete = false) {
             breathingIntervals.forEach(id => { clearTimeout(id); clearInterval(id); });
             breathingIntervals = [];
-            breathingText.textContent = "Start";
-            breathingCircle.style.transform = "scale(1)";
-            breathingGlow.style.transform = "scale(1)";
+
+            const breathingView = document.getElementById('sos-breathing-view');
             if (isComplete) {
-                breathingAnimationView.classList.add('hidden');
-                breathingCompleteView.classList.remove('hidden');
+                breathingView.classList.add('active'); // Keep dark theme for complete message
+                breathingAnimationView.style.display = 'none';
+                breathingCompleteView.style.display = 'flex';
+            } else {
+                 breathingView.classList.remove('active');
             }
         }
 
@@ -483,7 +593,9 @@
             localStorage.removeItem('smokeFreeMockDate');
             mockDate = null;
             state = {}; 
-            init(); 
+            // Instead of reloading, we re-initialize the app's logic
+                      init(); 
+
         }
 
         function showConfirmModal(type) { 
@@ -522,36 +634,50 @@
 
         function render() { renderDashboard(); renderTable(); }
         
-        function renderTable() { 
-            progressTableBody.innerHTML = ''; 
-            const todayStr = toISODateString(getCurrentDate()); 
-            if (!state.plan) return; 
-            state.plan.forEach(day => { 
-                const isToday = day.date === todayStr; 
-                const rowClass = isToday ? 'bg-slate-100 font-semibold' : ''; 
-                let statusClass = ''; 
-                let statusText = 'Pending'; 
-                if (day.status === 'Pass') { 
-                    statusClass = 'text-green-500'; statusText = 'Pass'; 
-                } else if (day.status === 'Fail') { 
-                    statusClass = 'text-red-500'; statusText = 'Fail'; 
-                } else if (day.status === 'Waiting') { 
-                    statusClass = 'text-amber-500'; statusText = 'Wait'; 
+        function renderTable() {
+            progressTableBody.innerHTML = '';
+            const todayStr = toISODateString(getCurrentDate());
+            if (!state.plan) return;
+            state.plan.forEach((day, index) => {
+                const isToday = day.date === todayStr;
+                const rowClass = isToday ? 'bg-slate-100 font-semibold' : '';
+                let statusClass = '';
+                let statusText = 'Pending';
+                if (day.status === 'Pass') {
+                    statusClass = 'text-green-500';
+                    statusText = 'Pass';
+                } else if (day.status === 'Fail') {
+                    statusClass = 'text-red-500';
+                    statusText = 'Fail';
+                } else if (day.status === 'Waiting') {
+                    statusClass = 'text-amber-500';
+                    statusText = 'Wait';
                 } else if (day.status === 'Over') {
-                    statusClass = 'text-blue-500'; statusText = 'Over';
+                    statusClass = 'text-blue-500';
+                    statusText = 'Over';
                 }
 
-                const progress = state.initialCount > 0 ? Math.round(((state.initialCount - day.target) / state.initialCount) * 100) : (day.target === 0 ? 100 : 0);
+                let progressCellContent = '-'; 
+                if (day.date < todayStr) { 
+                    const weekNumber = Math.floor(index / 7);
+                    let progress = 0;
+                    if (state.initialCount > 0) {
+                        progress = Math.min(100, Math.round(((weekNumber) / state.initialCount) * 100) + 10);
+                    } else if (day.target === 0) {
+                        progress = 100;
+                    }
+                    progressCellContent = `<span class="font-semibold text-cyan-600">${progress}%</span>`;
+                }
 
                 const row = `<tr class="${rowClass}">
                     <td class="py-3 px-2">${formatDate(day.date)}</td>
                     <td class="py-3 px-2 text-center">${day.target}</td>
                     <td class="py-3 px-2 text-center">${day.smoked}</td>
                     <td class="py-3 px-2 text-center font-semibold ${statusClass}">${statusText}</td>
-                    <td class="py-3 px-2 text-center">${progress}%</td>
-                </tr>`; 
-                progressTableBody.insertAdjacentHTML('beforeend', row); 
-            }); 
+                    <td class="py-3 px-2 text-center">${progressCellContent}</td>
+                </tr>`;
+                progressTableBody.insertAdjacentHTML('beforeend', row);
+            });
         }
 
         function startCountdown() { 
@@ -649,8 +775,50 @@
             location.reload();
         }
 
+        function handlePopState(event) {
+            if (event.state && event.state.screen) {
+                const screen = event.state.screen;
+                if (screen.startsWith('sos-')) {
+                    hideSosScreen();
+                    showSosScreen(); 
+                } else if (screen === 'sos') {
+                    showSosScreen();
+                } else {
+                    hideSosScreen();
+                    showScreen(screen);
+                }
+            } else {
+                hideSosScreen();
+            }
+        }
+
+        // NEW: Function to show appreciation message
+        function showAppreciationForYesterday() {
+            const yesterday = new Date(getCurrentDate());
+            yesterday.setDate(yesterday.getDate() - 1);
+            const yesterdayStr = toISODateString(yesterday);
+
+            const lastAppreciationDate = localStorage.getItem('lastAppreciationDate');
+            if (lastAppreciationDate === yesterdayStr) {
+                return; // Already shown for this date
+            }
+
+            const yesterdayEntry = state.plan.find(day => day.date === yesterdayStr);
+            if (yesterdayEntry && yesterdayEntry.status === 'Pass') {
+                const messages = translations[state.language]?.appreciationMessages;
+                if (messages) {
+                    const message = messages[Math.floor(Math.random() * messages.length)];
+                    document.getElementById('appreciation-modal-text').textContent = message;
+                    appreciationModal.classList.remove('hidden');
+                    appreciationModal.querySelector('.modal-content').classList.add('scale-100');
+                    localStorage.setItem('lastAppreciationDate', yesterdayStr);
+                }
+            }
+        }
+
         init();
     </script>
 </body>
 </html>
+
 
