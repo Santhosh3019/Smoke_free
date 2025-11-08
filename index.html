@@ -68,6 +68,24 @@
         #breathing-instruction.visible {
             opacity: 1;
         }
+        /* Running Message Animation */
+.marquee {
+    display: inline-block;
+    white-space: nowrap;
+    position: absolute;
+    will-change: transform;
+    animation: scrollText 15s linear infinite;
+}
+
+@keyframes scrollText {
+    0% {
+        transform: translateX(100%);
+    }
+    100% {
+        transform: translateX(-100%);
+    }
+}
+
     </style>
 </head>
 <body class="bg-slate-100 text-slate-800 antialiased">
@@ -123,9 +141,15 @@
             </div>
             
             <!-- Running Message -->
-            <div class="bg-white border border-slate-200 rounded-lg p-2 mb-6 shadow-sm">
-                 <p class="text-cyan-600 text-sm" data-translate="runningMessage"></p>
-            </div>
+          
+<div class="bg-white border border-slate-200 rounded-lg p-2 mb-6 shadow-sm overflow-hidden relative h-6">
+    <div class="marquee">
+        <p class="text-cyan-600 text-sm whitespace-nowrap" data-translate="runningMessage">
+            Don't be a slave to a stick of paper and leaves. Break the chains with every craving you conquer.
+        </p>
+    </div>
+</div>
+
             
              <!-- Progress Log -->
              <div class="flex-grow bg-white border border-slate-200 rounded-xl p-4 overflow-y-auto shadow-sm min-h-0">
@@ -192,7 +216,7 @@
                         <button class="w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:opacity-90 text-white font-bold py-4 rounded-lg text-lg" data-translate="sosGame">Play a Game</button>
                     </a>
                 </div>
-                <button id="sos-close-button" class="mt-8 text-slate-500 hover:text-slate-800" data-translate="sosClose">I'm okay now, close this.</button>
+               // <button id="sos-close-button" class="mt-8 text-slate-500 hover:text-slate-800" data-translate="sosClose">I'm okay now, close this.</button>
             </div>
             
             <!-- Breathing Exercise -->
@@ -250,7 +274,6 @@
         const sosMenu = document.getElementById('sos-menu');
         const sosBreathingView = document.getElementById('sos-breathing-view');
         const sosMotivationView = document.getElementById('sos-motivation-view');
-        const sosCloseButton = document.getElementById('sos-close-button');
         const breathingAnimationView = document.getElementById('breathing-animation-view');
         const breathingCompleteView = document.getElementById('breathing-complete-view');
         const motivationQuoteText = document.getElementById('motivation-quote-text');
@@ -413,16 +436,16 @@
             document.getElementById('confirm-yes-button').addEventListener('click', resetJourney);
             nextDayButton.addEventListener('click', advanceDay);
 
-            sosCloseButton.addEventListener('click', hideSosScreen);
+            
             document.querySelectorAll('[data-sos]').forEach(btn => {
                 if (btn.dataset.sos !== 'game') {
                     btn.addEventListener('click', () => handleSosChoice(btn.dataset.sos));
                 }
             });
-            document.getElementById('breathing-done-button').addEventListener('click', () => showSosView('menu'));
-            document.getElementById('breathing-back-button').addEventListener('click', () => showSosView('menu'));
-            document.getElementById('motivation-back-button').addEventListener('click', () => showSosView('menu'));
-            document.getElementById('appreciation-close-button').addEventListener('click', () => closeModal('appreciation-modal'));
+           document.getElementById('breathing-done-button').addEventListener('click', () => showSosView('menu'));
+           document.getElementById('breathing-back-button').addEventListener('click', hideSosScreen);
+           document.getElementById('motivation-back-button').addEventListener('click', hideSosScreen);
+        document.getElementById('appreciation-close-button').addEventListener('click', () => closeModal('appreciation-modal'));
         }
         
         function generatePlan() { 
@@ -820,5 +843,6 @@
     </script>
 </body>
 </html>
+
 
 
